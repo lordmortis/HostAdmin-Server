@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
-	"github.com/lordmortis/hostAdminServer/controllers"
+	"github.com/lordmortis/HostaAdmin-Server/datasource"
 	"runtime"
 
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
+
+	"github.com/lordmortis/HostaAdmin-Server/services"
+	"github.com/lordmortis/HostaAdmin-Server/web/controllers"
 )
 
 var (
@@ -30,6 +33,23 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
+	err = datasource.PerformMigrations(config.Database)
+	if err != nil {
+		fmt.Println("Unable to perform/check migrations")
+		fmt.Println(err)
+		return
+	}
+
+	var dbService services.DatabaseService
+	dbService, err = services.NewDatabaseService(config.Database)
+	if err != nil {
+		fmt.Println("Unable to setup database connection:")
+		fmt.Println(err)
+		return
+	}
+
+	_ = dbService
 
 	app := iris.New()
 

@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"github.com/kataras/iris"
 	"strconv"
 )
 
-type UsersController struct {}
+type UsersController struct {
+	Ctx iris.Context
+}
 
 /*func (c *UsersController) BeforeActivation(b mvc.BeforeActivation) {
 }*/

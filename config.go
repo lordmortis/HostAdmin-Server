@@ -4,13 +4,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"strconv"
-)
 
-type DatabaseConfig struct {
-	Hostname string
-	Username string
-	Password string
-}
+	"github.com/lordmortis/HostaAdmin-Server/services"
+)
 
 type ServerConfig struct {
 	BindAddress string
@@ -22,7 +18,7 @@ type LoggingConfig struct {
 }
 
 type Config struct {
-	Database DatabaseConfig `json:"db"`
+	Database services.DatabaseConfig `json:"db"`
 	Server ServerConfig
 	Logging LoggingConfig
 }
@@ -30,6 +26,7 @@ type Config struct {
 func defaultConfig() Config {
 	var config = Config{}
 	config.Database.Hostname = "127.0.0.1"
+	config.Database.Port = 5432
 	config.Server.BindAddress = "127.0.0.1"
 	config.Server.Port = 3000
 	config.Logging.Level = "info"
