@@ -6,13 +6,13 @@ import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
 	"github.com/lordmortis/HostaAdmin-Server/datasource"
+	"github.com/lordmortis/HostaAdmin-Server/web/controllers"
 	"runtime"
 
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
 
 	"github.com/lordmortis/HostaAdmin-Server/services"
-	"github.com/lordmortis/HostaAdmin-Server/web/controllers"
 )
 
 var (
@@ -49,8 +49,6 @@ func main() {
 		return
 	}
 
-	_ = dbService
-
 	app := iris.New()
 
 	app.Logger().SetLevel(config.Logging.Level)
@@ -58,7 +56,9 @@ func main() {
 	app.Use(recover.New())
 	app.Use(logger.New())
 
-	mvc.New(app.Party("/users")).Handle(new(controllers.UsersController))
+	userController := mvc.New(app.Party("/users"))
+	userController.Register(dbService)
+	userController.Handle(new(controllers.UsersController))
 
 	fmt.Println("Log level is: " + config.Logging.Level)
 	app.Run(iris.Addr(config.Server.String()), iris.WithoutServerError(iris.ErrServerClosed))

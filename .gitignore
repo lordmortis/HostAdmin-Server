@@ -2,3 +2,4 @@
 *.exe
 !*.sample.json
 config
+sqlboiler.toml

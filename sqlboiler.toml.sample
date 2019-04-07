@@ -1,0 +1,9 @@
+[psql]
+    dbname = <DATABASE>
+    user = <USER>
+    pass = <PASSWORD>
+    blacklist = ["schema_migrations"]
+    pkgname = "datamodels"
+    output = "datamodels"
+    host = <HOSTNAME>
+    sslmode = "disable"

@@ -1,7 +1,8 @@
 package services
 
 import (
-	"github.com/go-xorm/xorm"
+	"database/sql"
+
 	_ "github.com/lib/pq"
 	"strconv"
 )
@@ -15,11 +16,11 @@ type DatabaseConfig struct {
 }
 
 type DatabaseService interface {
-	GetEngine() *xorm.Engine
+	GetConnection() *sql.DB
 }
 
 type dbService struct {
-	engine *xorm.Engine
+	conn *sql.DB
 }
 
 func NewDatabaseService(config DatabaseConfig) (DatabaseService, error) {
@@ -28,15 +29,16 @@ func NewDatabaseService(config DatabaseConfig) (DatabaseService, error) {
 	connectionString += "host='" + config.Hostname + "' "
 	connectionString += "port=" + strconv.Itoa(config.Port) + " "
 	connectionString += "dbname='" + config.Database + "' "
-	engine, err := xorm.NewEngine("postgres", connectionString)
+	connectionString += "sslmode='disable'"
+	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
 	}
 
-	var service = dbService{engine:engine}
+	var service = dbService{conn:db}
 	return &service, nil
 }
 
-func (svc *dbService) GetEngine() *xorm.Engine{
-	return svc.engine
+func (svc *dbService) GetConnection() *sql.DB {
+	return svc.conn
 }
