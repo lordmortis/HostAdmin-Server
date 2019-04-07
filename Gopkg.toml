@@ -1,0 +1,3 @@
+[[constraint]]
+  name = "github.com/kataras/iris"
+  version = "11.1.0"
