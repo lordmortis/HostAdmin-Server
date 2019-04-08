@@ -43,11 +43,7 @@ func (user *User) Validate() bool {
 		valid = false
 	}
 
-	if len(user.NewPassword) == 0 {
-		valid = false
-	}
-
-	if user.NewPassword != user.PasswordConfirmation {
+	if len(user.NewPassword) > 0 && user.NewPassword != user.PasswordConfirmation {
 		valid = false
 	}
 

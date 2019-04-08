@@ -19,7 +19,8 @@ func Users(router *gin.Engine, db *services.DatabaseService) {
 	dbService = db
 	router.GET("/1/users", list)
 	router.POST("/1/users", create)
-	router.GET("/1/user/:id", get)
+	router.GET("/1/user/:id", show)
+	router.PUT("/1/user/:id", update)
 }
 
 func list(ctx *gin.Context) {
@@ -39,7 +40,7 @@ func list(ctx *gin.Context) {
 	ctx.JSON(200, viewModels)
  }
 
-func get(ctx *gin.Context) {
+func show(ctx *gin.Context) {
 	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
 	if err != nil {
 		_ = ctx.Error(err)
@@ -65,7 +66,7 @@ func create(ctx *gin.Context) {
 		return
 	}
 
-	if !newUserJson.Validate() {
+	if !newUserJson.Validate() || len(newUserJson.NewPassword) == 0 {
 		_ = ctx.Error(errors.New("invalid model"))
 		return
 	}
@@ -87,5 +88,37 @@ func create(ctx *gin.Context) {
 
 	newUserJson = viewmodels.User{}
 	newUserJson.FromDB(&dbModel)
+	ctx.JSON(200, newUserJson)
+}
+
+func update(ctx *gin.Context) {
+	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	if dbModel == nil {
+		ctx.String(404, "not found")
+		return
+	}
+
+	newUserJson := viewmodels.User{}
+	if err := ctx.ShouldBindJSON(&newUserJson); err != nil {
+		println(err.Error())
+		_ = ctx.Error(err)
+		return
+	}
+
+	newUserJson.ToDB(dbModel)
+
+	if _, err := dbModel.Update(ctx, (*dbService).GetConnection(), boil.Infer()); err != nil {
+		println(err.Error())
+		_ = ctx.Error(err)
+		return
+	}
+	
+	newUserJson = viewmodels.User{}
+	newUserJson.FromDB(dbModel)
 	ctx.JSON(200, newUserJson)
 }
