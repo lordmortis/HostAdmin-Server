@@ -5,6 +5,8 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
+	"github.com/volatiletech/null"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/lordmortis/HostAdmin-Server/services"
@@ -32,4 +34,14 @@ func UserById(ctx *gin.Context, dbService *services.DatabaseService, stringID st
 	}
 
 	return user, nil
+}
+
+func UserSetPassword(user *datamodels_raw.User, newPassword string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.EncryptedPassword = null.BytesFrom(hashedPassword)
+	return nil
 }
