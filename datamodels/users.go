@@ -1,16 +1,17 @@
 package datamodels
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	"encoding/base64"
+	"github.com/satori/go.uuid"
+
+	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
 
-func GeneratePassword(userPassword string, cost int) ([]byte, error) {
-	return bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
+func UserUUID(user *datamodels_raw.User) uuid.UUID {
+	return uuid.FromStringOrNil(user.ID)
 }
 
-func ValidatePassword(userPassword string, hashed []byte) (bool, error) {
-	if err := bcrypt.CompareHashAndPassword(hashed, []byte(userPassword)); err != nil {
-		return false, err
-	}
-	return true, nil
+func UserUUIDBase64(user *datamodels_raw.User) string {
+	uuid := UserUUID(user)
+	return base64.StdEncoding.EncodeToString(uuid.Bytes())
 }
