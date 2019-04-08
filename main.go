@@ -3,16 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/mvc"
-	"github.com/lordmortis/HostaAdmin-Server/datasource"
-	"github.com/lordmortis/HostaAdmin-Server/web/controllers"
+	"github.com/gin-gonic/gin"
+	"github.com/lordmortis/HostAdmin-Server/controllers"
 	"runtime"
 
-	"github.com/kataras/iris/middleware/logger"
-	"github.com/kataras/iris/middleware/recover"
-
-	"github.com/lordmortis/HostaAdmin-Server/services"
+	"github.com/lordmortis/HostAdmin-Server/datasource"
+	"github.com/lordmortis/HostAdmin-Server/services"
 )
 
 var (
@@ -49,17 +45,9 @@ func main() {
 		return
 	}
 
-	app := iris.New()
 
-	app.Logger().SetLevel(config.Logging.Level)
+	router := gin.Default()
+	controllers.Users(router, &dbService)
 
-	app.Use(recover.New())
-	app.Use(logger.New())
-
-	userController := mvc.New(app.Party("/users"))
-	userController.Register(dbService)
-	userController.Handle(new(controllers.UsersController))
-
-	fmt.Println("Log level is: " + config.Logging.Level)
-	app.Run(iris.Addr(config.Server.String()), iris.WithoutServerError(iris.ErrServerClosed))
+	router.Run(config.Server.String())
 }

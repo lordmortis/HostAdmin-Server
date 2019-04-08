@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"github.com/lordmortis/HostaAdmin-Server/services"
+	"github.com/lordmortis/HostAdmin-Server/services"
 )
 
 type ServerConfig struct {
