@@ -1,8 +1,10 @@
 {
   "db": {
     "hostname": "127.0.0.1",
-    "username": "username",
-    "password": "password"
+    "port" : 5432,
+    "database": "<DATABASE>",
+    "username": "<DBUSER>",
+    "password": "<DBPASS>"
   },
   "server" : {
     "bindAddress": "0.0.0.0",

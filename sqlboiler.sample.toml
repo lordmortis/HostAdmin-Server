@@ -1,9 +1,10 @@
 [psql]
-    dbname = <DATABASE>
-    user = <USER>
-    pass = <PASSWORD>
+    dbname = "<DATABASE>"
+    user = "<DBUSER>"
+    pass = "<DBPASS>"
     blacklist = ["schema_migrations"]
     pkgname = "datamodels"
     output = "datamodels"
     host = <HOSTNAME>
+    port = 5442
     sslmode = "disable"
