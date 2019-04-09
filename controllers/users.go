@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
+	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"net/http"
 
@@ -66,12 +66,13 @@ func create(ctx *gin.Context) {
 	newUserJson := viewmodels.User{}
 
 	if err := ctx.ShouldBindJSON(&newUserJson); err != nil {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
+		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
 		return
 	}
 
-	if !newUserJson.Validate() || len(newUserJson.NewPassword) == 0 {
-		_ = ctx.Error(errors.New("invalid model"))
+	modelErrors := newUserJson.ValidateCreate()
+	if len(modelErrors) > 0 {
+		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
@@ -110,13 +111,26 @@ func update(ctx *gin.Context) {
 		return
 	}
 
-	newUserJson := viewmodels.User{}
-	if err := ctx.ShouldBindJSON(&newUserJson); err != nil {
+	updateUserJSON := viewmodels.User{}
+	if err := ctx.ShouldBindJSON(&updateUserJSON); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
 		return
 	}
 
-	newUserJson.ToDB(dbModel)
+	modelErrors := updateUserJSON.ValidateUpdate()
+	if len(modelErrors) > 0 {
+		JSONBadRequest(ctx, modelErrors)
+		return
+	}
+
+	if len(updateUserJSON.NewPassword) > 0 {
+		if !datamodels.UserValidatePassword(dbModel, updateUserJSON.OldPassword) {
+			JSONBadRequest(ctx, gin.H{"current_password": [1]string{"not set or incorrect"}})
+			return
+		}
+	}
+
+	updateUserJSON.ToDB(dbModel)
 
 	rows, err := dbModel.Update(ctx, dbCon, boil.Infer())
 	if err != nil {
@@ -125,10 +139,10 @@ func update(ctx *gin.Context) {
 		return
 	}
 
-	newUserJson = viewmodels.User{}
-	newUserJson.FromDB(dbModel)
+	updateUserJSON = viewmodels.User{}
+	updateUserJSON.FromDB(dbModel)
 	if rows == 1 {
-		JSONOk(ctx, newUserJson)
+		JSONOk(ctx, updateUserJSON)
 	} else {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{"no rows updated"}})
 	}

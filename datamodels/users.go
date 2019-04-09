@@ -47,3 +47,10 @@ func UserSetPassword(user *datamodels_raw.User, newPassword string) error {
 	user.EncryptedPassword = null.BytesFrom(hashedPassword)
 	return nil
 }
+
+func UserValidatePassword(user *datamodels_raw.User, password string) bool {
+	if err := bcrypt.CompareHashAndPassword(user.EncryptedPassword.Bytes, []byte(password)); err != nil {
+		return false
+	}
+	return true
+}

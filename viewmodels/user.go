@@ -4,6 +4,7 @@ import (
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/satori/go.uuid"
+	"regexp"
 	"time"
 )
 
@@ -16,6 +17,14 @@ type User struct {
 	PasswordConfirmation string `json:"password_confirmation,omitempty"`
 	CreatedAt string `json:"created_at,omitempty"`
 	UpdatedAt string `json:"updated_at,omitempty"`
+}
+
+var (
+	emailRegexp *regexp.Regexp
+)
+
+func init() {
+	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 }
 
 func (user *User)FromDB(dbModel *datamodels_raw.User) {
@@ -32,22 +41,49 @@ func (user *User)FromDB(dbModel *datamodels_raw.User) {
 	}
 }
 
-func (user *User) Validate() bool {
-	valid := true
+func (user *User) ValidateCreate() map[string]interface{} {
+	errorMap := make(map[string]interface{})
 
 	if len(user.Username) == 0 {
-		valid = false
+		errorMap["username"] = []string{"must be present"}
+	} else if len(user.Username) < 4 {
+		errorMap["username"] = []string{"must be at least 4 characters"}
 	}
 
 	if len(user.Email) == 0 {
-		valid = false
+		errorMap["email"] = []string{"must be present"}
+	} else if !emailRegexp.MatchString(user.Email) {
+		errorMap["email"] = []string{"must be a valid email address"}
+	}
+
+	if len(user.NewPassword) == 0 {
+		errorMap["new_password"] = []string{"required"}
+		errorMap["password_confirmation"] = []string{"required"}
+	} else if user.NewPassword != user.PasswordConfirmation {
+		errorMap["new_password"] = []string{"must equal password_confirmation"}
+		errorMap["password_confirmation"] = []string{"must equal new_password"}
+	}
+
+	return errorMap
+}
+
+func (user *User) ValidateUpdate() map[string]interface{} {
+	errorMap := make(map[string]interface{})
+
+	if len(user.Username) != 0 && len(user.Username) < 4 {
+		errorMap["username"] = []string{"must be at least 4 characters"}
+	}
+
+	if len(user.Email) > 0 && !emailRegexp.MatchString(user.Email) {
+		errorMap["email"] = []string{"must be a valid email address"}
 	}
 
 	if len(user.NewPassword) > 0 && user.NewPassword != user.PasswordConfirmation {
-		valid = false
+		errorMap["new_password"] = []string{"must equal password_confirmation"}
+		errorMap["password_confirmation"] = []string{"must equal new_password"}
 	}
 
-	return valid
+	return errorMap
 }
 
 func (user *User) ToDB(dbModel *datamodels_raw.User) {
