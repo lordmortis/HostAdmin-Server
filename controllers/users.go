@@ -7,6 +7,7 @@ import (
 	"github.com/lordmortis/HostAdmin-Server/services"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/volatiletech/sqlboiler/boil"
+	"net/http"
 
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
@@ -21,6 +22,7 @@ func Users(router *gin.Engine, db *services.DatabaseService) {
 	router.POST("/1/users", create)
 	router.GET("/1/user/:id", show)
 	router.PUT("/1/user/:id", update)
+	router.DELETE("/1/user/:id", delete)
 }
 
 func list(ctx *gin.Context) {
@@ -112,13 +114,45 @@ func update(ctx *gin.Context) {
 
 	newUserJson.ToDB(dbModel)
 
-	if _, err := dbModel.Update(ctx, (*dbService).GetConnection(), boil.Infer()); err != nil {
+	rows, err := dbModel.Update(ctx, (*dbService).GetConnection(), boil.Infer())
+	if err != nil {
 		println(err.Error())
 		_ = ctx.Error(err)
 		return
 	}
-	
+
 	newUserJson = viewmodels.User{}
 	newUserJson.FromDB(dbModel)
-	ctx.JSON(200, newUserJson)
+	if rows == 1 {
+		ctx.JSON(http.StatusOK, newUserJson)
+	} else {
+		ctx.JSON(http.StatusBadRequest, newUserJson)
+	}
+}
+
+func delete(ctx *gin.Context) {
+	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	if dbModel == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "not found"})
+		return
+	}
+
+	rows, err := dbModel.Delete(ctx, (*dbService).GetConnection());
+
+	if err != nil {
+		println(err.Error())
+		_ = ctx.Error(err)
+		return
+	}
+
+	if rows == 1 {
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "error"})
+	}
 }

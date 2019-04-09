@@ -1,6 +1,7 @@
 package datamodels
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,9 @@ func UserById(ctx *gin.Context, dbService *services.DatabaseService, stringID st
 
 	user, err := datamodels_raw.FindUser(ctx,(*dbService).GetConnection(), userID.String())
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
