@@ -3,7 +3,6 @@ package datamodels
 import (
 	"database/sql"
 	"encoding/base64"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 	"github.com/volatiletech/null"
@@ -25,7 +24,7 @@ func UserById(ctx *gin.Context, dbCon *sql.DB, stringID string) (*datamodels_raw
 	userID := UUIDFromString(stringID)
 
 	if userID == uuid.Nil {
-		return nil, errors.New("unable to parse ID")
+		return nil, UUIDParseError
 	}
 
 	user, err := datamodels_raw.FindUser(ctx,dbCon, userID.String())
