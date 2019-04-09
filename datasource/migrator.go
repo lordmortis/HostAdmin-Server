@@ -7,10 +7,10 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
-	"github.com/lordmortis/HostAdmin-Server/services"
+	"github.com/lordmortis/HostAdmin-Server/config"
 )
 
-func PerformMigrations(config services.DatabaseConfig) error {
+func PerformMigrations(config config.DatabaseConfig) error {
 	var connString = "postgres://" + config.Username + ":" + config.Password
 	connString += "@" + config.Hostname + ":" + strconv.Itoa(config.Port)
 	connString += "/" + config.Database + "?sslmode=disable"

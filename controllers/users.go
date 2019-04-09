@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
-	"github.com/lordmortis/HostAdmin-Server/services"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/volatiletech/sqlboiler/boil"
 	"net/http"
@@ -12,21 +12,18 @@ import (
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
 
-var (
-	dbService *services.DatabaseService
-)
-
-func Users(router *gin.Engine, db *services.DatabaseService) {
-	dbService = db
-	router.GET("/1/users", list)
-	router.POST("/1/users", create)
-	router.GET("/1/user/:id", show)
-	router.PUT("/1/user/:id", update)
-	router.DELETE("/1/user/:id", delete)
+func Users(router *gin.Engine) {
+	userGroup := router.Group("/1/users")
+	userGroup.GET("", list)
+	userGroup.POST("", create)
+	userGroup.GET("/:id", show)
+	userGroup.PUT("/:id", update)
+	userGroup.DELETE("/:id", delete)
 }
 
 func list(ctx *gin.Context) {
-	dbModels, err := datamodels_raw.Users().All(ctx, (*dbService).GetConnection())
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
 	if err != nil {
 		println(err.Error())
 		_ = ctx.Error(err)
@@ -39,11 +36,12 @@ func list(ctx *gin.Context) {
 		viewModel.FromDB(dbModels[index])
 		viewModels[index] = viewModel
 	}
-	ctx.JSON(200, viewModels)
+	ctx.JSON(http.StatusOK, viewModels)
  }
 
 func show(ctx *gin.Context) {
-	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+ 	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
 		_ = ctx.Error(err)
 		return
@@ -56,10 +54,11 @@ func show(ctx *gin.Context) {
 
 	viewModel := viewmodels.User{}
 	viewModel.FromDB(dbModel)
-	ctx.JSON(200, viewModel)
+	ctx.JSON(http.StatusOK, viewModel)
 }
 
 func create(ctx *gin.Context) {
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 	newUserJson := viewmodels.User{}
 
 	if err := ctx.ShouldBindJSON(&newUserJson); err != nil {
@@ -76,13 +75,12 @@ func create(ctx *gin.Context) {
 	dbModel := datamodels_raw.User{}
 	newUserJson.ToDB(&dbModel)
 
-	if err := dbModel.Insert(ctx, (*dbService).GetConnection(), boil.Infer()); err != nil {
-		println(err.Error())
+	if err := dbModel.Insert(ctx, dbCon, boil.Infer()); err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
-	if err := dbModel.Reload(ctx, (*dbService).GetConnection()); err != nil {
+	if err := dbModel.Reload(ctx, dbCon); err != nil {
 		println(err.Error())
 		_ = ctx.Error(err)
 		return
@@ -90,18 +88,19 @@ func create(ctx *gin.Context) {
 
 	newUserJson = viewmodels.User{}
 	newUserJson.FromDB(&dbModel)
-	ctx.JSON(200, newUserJson)
+	ctx.JSON(http.StatusOK, newUserJson)
 }
 
 func update(ctx *gin.Context) {
-	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
 	if dbModel == nil {
-		ctx.String(404, "not found")
+		ctx.String(http.StatusNotFound, "not found")
 		return
 	}
 
@@ -114,7 +113,7 @@ func update(ctx *gin.Context) {
 
 	newUserJson.ToDB(dbModel)
 
-	rows, err := dbModel.Update(ctx, (*dbService).GetConnection(), boil.Infer())
+	rows, err := dbModel.Update(ctx, dbCon, boil.Infer())
 	if err != nil {
 		println(err.Error())
 		_ = ctx.Error(err)
@@ -131,7 +130,8 @@ func update(ctx *gin.Context) {
 }
 
 func delete(ctx *gin.Context) {
-	dbModel, err := datamodels.UserById(ctx, dbService, ctx.Param("id"))
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
 		_ = ctx.Error(err)
 		return
@@ -142,7 +142,7 @@ func delete(ctx *gin.Context) {
 		return
 	}
 
-	rows, err := dbModel.Delete(ctx, (*dbService).GetConnection());
+	rows, err := dbModel.Delete(ctx, dbCon)
 
 	if err != nil {
 		println(err.Error())

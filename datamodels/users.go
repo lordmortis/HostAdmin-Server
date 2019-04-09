@@ -10,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
-	"github.com/lordmortis/HostAdmin-Server/services"
 )
 
 func UserUUID(user *datamodels_raw.User) uuid.UUID {
@@ -22,14 +21,14 @@ func UserUUIDBase64(user *datamodels_raw.User) string {
 	return base64.StdEncoding.EncodeToString(uuid.Bytes())
 }
 
-func UserById(ctx *gin.Context, dbService *services.DatabaseService, stringID string) (*datamodels_raw.User, error) {
+func UserById(ctx *gin.Context, dbCon *sql.DB, stringID string) (*datamodels_raw.User, error) {
 	userID := UUIDFromString(stringID)
 
 	if userID == uuid.Nil {
 		return nil, errors.New("unable to parse ID")
 	}
 
-	user, err := datamodels_raw.FindUser(ctx,(*dbService).GetConnection(), userID.String())
+	user, err := datamodels_raw.FindUser(ctx,dbCon, userID.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

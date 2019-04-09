@@ -4,15 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/lordmortis/HostAdmin-Server/controllers"
 	"runtime"
 
+	"github.com/lordmortis/HostAdmin-Server/config"
+	"github.com/lordmortis/HostAdmin-Server/controllers"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
-	"github.com/lordmortis/HostAdmin-Server/services"
-)
-
-var (
-	config *Config
+	"github.com/lordmortis/HostAdmin-Server/middleware"
 )
 
 func main() {
@@ -21,24 +18,22 @@ func main() {
 
 	flag.Parse()
 
-	var err error
-
-	config, err = LoadConfig(*configFile)
+	conf, err := config.Load(configFile)
 	if err != nil {
 		fmt.Println("Unable to parse Config file")
 		fmt.Println(err)
 		return
 	}
 
-	err = datasource.PerformMigrations(config.Database)
+	err = datasource.PerformMigrations(conf.Database)
 	if err != nil {
 		fmt.Println("Unable to perform/check migrations")
 		fmt.Println(err)
 		return
 	}
 
-	var dbService services.DatabaseService
-	dbService, err = services.NewDatabaseService(config.Database)
+	var dbMiddleware gin.HandlerFunc
+	dbMiddleware, err = middleware.Database(conf.Database)
 	if err != nil {
 		fmt.Println("Unable to setup database connection:")
 		fmt.Println(err)
@@ -47,7 +42,8 @@ func main() {
 
 
 	router := gin.Default()
-	controllers.Users(router, &dbService)
+	router.Use(dbMiddleware)
+	controllers.Users(router)
 
-	router.Run(config.Server.String())
+	router.Run(conf.Server.String())
 }

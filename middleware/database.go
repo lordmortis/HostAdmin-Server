@@ -1,28 +1,14 @@
-package services
+package middleware
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
+	"github.com/gin-gonic/gin"
 	"strconv"
+
+	"github.com/lordmortis/HostAdmin-Server/config"
 )
 
-type DatabaseConfig struct {
-	Hostname string
-	Port int
-	Database string
-	Username string
-	Password string
-}
-
-type DatabaseService interface {
-	GetConnection() *sql.DB
-}
-
-type dbService struct {
-	conn *sql.DB
-}
-
-func NewDatabaseService(config DatabaseConfig) (DatabaseService, error) {
+func Database(config config.DatabaseConfig) (gin.HandlerFunc, error) {
 	var connectionString = "user='" + config.Username + "' "
 	connectionString += "password='" + config.Password + "' "
 	connectionString += "host='" + config.Hostname + "' "
@@ -34,10 +20,8 @@ func NewDatabaseService(config DatabaseConfig) (DatabaseService, error) {
 		return nil, err
 	}
 
-	var service = dbService{conn:db}
-	return &service, nil
-}
-
-func (svc *dbService) GetConnection() *sql.DB {
-	return svc.conn
+	handler := func(ctx *gin.Context) {
+		ctx.Set("databaseConnection", db)
+	}
+	return handler, nil
 }
