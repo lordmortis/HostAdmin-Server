@@ -51,7 +51,11 @@ func main() {
 	router := gin.Default()
 	router.Use(dbMiddleware)
 	router.Use(redisMiddleware)
-	controllers.Users(router)
+
+	loginGroup := router.Group("/1/login")
+	controllers.Login(loginGroup)
+	userGroup := router.Group("/1/users")
+	controllers.Users(userGroup)
 
 	err = router.Run(conf.Server.String())
 	if err != nil {

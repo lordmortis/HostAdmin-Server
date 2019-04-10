@@ -12,13 +12,12 @@ import (
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
 
-func Users(router *gin.Engine) {
-	userGroup := router.Group("/1/users")
-	userGroup.GET("", list)
-	userGroup.POST("", create)
-	userGroup.GET("/:id", show)
-	userGroup.PUT("/:id", update)
-	userGroup.DELETE("/:id", delete)
+func Users(router gin.IRoutes) {
+	router.GET("", list)
+	router.POST("", create)
+	router.GET("/:id", show)
+	router.PUT("/:id", update)
+	router.DELETE("/:id", delete)
 }
 
 func list(ctx *gin.Context) {

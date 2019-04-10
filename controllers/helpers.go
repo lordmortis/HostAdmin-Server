@@ -25,3 +25,7 @@ func JSONOk(ctx *gin.Context, response interface{}) {
 func JSONOkStatusResponse(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status" : "ok"})
 }
+
+func JSONNotAuthorizedResponse(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, gin.H{"status" : "not authorized"})
+}
