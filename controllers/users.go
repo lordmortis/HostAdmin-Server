@@ -23,6 +23,7 @@ func Users(router *gin.Engine) {
 
 func list(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+
 	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
 	if err != nil {
 		JSONInternalServerError(ctx, err)

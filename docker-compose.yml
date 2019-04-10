@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  postgres10:
+    image: postgres:10-alpine
+    networks:
+      - front
+    ports:
+      - 15432:5432
+    volumes:
+      - postgres10Data:/var/lib/postgresql/data
+    restart: "no"
+    environment:
+      POSTGRES_PASSWORD: rootpassword
+  redis:
+    image: redis:5-alpine
+    networks:
+      - front
+    ports:
+      - 16379:6379
+
+volumes:
+  postgres10Data:
+
+networks:
+  front:

@@ -40,10 +40,23 @@ func main() {
 		return
 	}
 
+	var redisMiddleware gin.HandlerFunc
+	redisMiddleware, err = middleware.Redis(conf.Redis)
+	if err != nil {
+		fmt.Println("Unable to connect to redis:")
+		fmt.Println(err)
+		return
+	}
 
 	router := gin.Default()
 	router.Use(dbMiddleware)
+	router.Use(redisMiddleware)
 	controllers.Users(router)
 
-	router.Run(conf.Server.String())
+	err = router.Run(conf.Server.String())
+	if err != nil {
+		fmt.Println("Unable to start server")
+		fmt.Println(err)
+		return
+	}
 }

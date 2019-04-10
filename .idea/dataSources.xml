@@ -5,7 +5,13 @@
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5442/s7admin-dev</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:15432/s7admin-dev</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="postgres@localhost" uuid="27a84c59-581b-47a8-b4dd-7acbcc307a37">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15432/postgres</jdbc-url>
     </data-source>
   </component>
 </project>
