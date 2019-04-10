@@ -12,6 +12,7 @@ import (
 
 type Session struct {
 	ID uuid.UUID
+	Base64ID string
 	Expiry time.Time
 	Model string
 	ModelID []byte
@@ -41,6 +42,6 @@ func AuthCreateSession(redisClient *redis.Client, redisPrefix string, model stri
 
 	redisClient.Set(redisPrefix + "session:" + base64ID, encodedRedisSession, expiryDuration)
 
-	session := Session{sessionID, time.Now().Add(expiryDuration),  model, modelID}
+	session := Session{sessionID, base64ID, time.Now().Add(expiryDuration),  model, modelID}
 	return &session, nil
 }

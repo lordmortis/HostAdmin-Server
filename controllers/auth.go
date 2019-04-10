@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
+	"math"
+	"strings"
 	"time"
 )
 
@@ -69,6 +71,10 @@ func login(ctx *gin.Context) {
 		JSONInternalServerError(ctx, err)
 		return
 	}
+
+	maxAge := int(math.Round(session.Expiry.Sub(time.Now()).Seconds()))
+	domain := strings.Split(ctx.Request.Host, ":")[0]
+	ctx.SetCookie("sessionID", session.Base64ID, maxAge, "/", domain, true, true)
 
 	JSONOk(ctx, gin.H{
 		"sessionID": base64.StdEncoding.EncodeToString(session.ID.Bytes()),
