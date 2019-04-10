@@ -48,6 +48,8 @@ func main() {
 		return
 	}
 
+	authMiddleware := middleware.Auth()
+
 	router := gin.Default()
 	router.Use(dbMiddleware)
 	router.Use(redisMiddleware)
@@ -55,6 +57,7 @@ func main() {
 	loginGroup := router.Group("/1/login")
 	controllers.Login(loginGroup)
 	userGroup := router.Group("/1/users")
+	userGroup.Use(authMiddleware)
 	controllers.Users(userGroup)
 
 	err = router.Run(conf.Server.String())

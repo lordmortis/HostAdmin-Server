@@ -2,9 +2,7 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/lordmortis/HostAdmin-Server/middleware"
@@ -12,8 +10,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
-	"math"
-	"strings"
 	"time"
 )
 
@@ -23,8 +19,6 @@ func Login(router gin.IRoutes) {
 
 func login(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	redisCon := ctx.MustGet("redisConnection").(*redis.Client)
-	redisPrefix := ctx.MustGet("redisPrefix").(string)
 
 	loginData := viewmodels.Login{}
 
@@ -66,18 +60,14 @@ func login(ctx *gin.Context) {
 	}
 
 	var userIDBytes = datamodels.UUIDFromString(dbModels[0].ID).Bytes()
-	session, err := middleware.AuthCreateSession(redisCon, redisPrefix,"User", userIDBytes)
+	session, err := middleware.AuthCreateSession(ctx, "User", userIDBytes)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	maxAge := int(math.Round(session.Expiry.Sub(time.Now()).Seconds()))
-	domain := strings.Split(ctx.Request.Host, ":")[0]
-	ctx.SetCookie("sessionID", session.Base64ID, maxAge, "/", domain, true, true)
-
 	JSONOk(ctx, gin.H{
-		"sessionID": base64.StdEncoding.EncodeToString(session.ID.Bytes()),
+		"sessionID": session.Base64ID,
 		"expiry": session.Expiry.Format(time.RFC3339),
 	})
 }
