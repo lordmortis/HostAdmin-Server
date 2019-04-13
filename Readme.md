@@ -22,5 +22,5 @@
   2. Create the login role from the settings you did above: 
      * `CREATE ROLE "<DBUSER>" WITH PASSWORD '<DBPASS>' LOGIN` (the difference in quoting is intentional)
   3. Create the database via:
-     * `CREATE DATABASE "s7admin-dev" OWNER "s7admin-dev"`
+     * `CREATE DATABASE "<DBNAME>" OWNER "<DBUSER>"`
   4. The application should create any apropriate database fields on bootup!
