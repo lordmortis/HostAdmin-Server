@@ -1,6 +1,6 @@
 *.json
 *.exe
 !*.sample.json
-config
 sqlboiler.toml
+bin/
 tmp/
