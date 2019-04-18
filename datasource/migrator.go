@@ -19,8 +19,10 @@ func PerformMigrations(config config.DatabaseConfig) error {
 		return err
 	}
 
-	_ = m.Up()
+	err = m.Up()
+	_ = err
 	// TODO: handle errors with migrations...
 
+	m.Close()
 	return nil
 }
