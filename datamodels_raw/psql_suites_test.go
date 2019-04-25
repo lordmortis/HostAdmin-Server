@@ -6,5 +6,7 @@ package datamodels_raw
 import "testing"
 
 func TestUpsert(t *testing.T) {
+	t.Run("Domains", testDomainsUpsert)
+
 	t.Run("Users", testUsersUpsert)
 }

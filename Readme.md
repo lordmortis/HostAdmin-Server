@@ -24,3 +24,10 @@
   3. Create the database via:
      * `CREATE DATABASE "<DBNAME>" OWNER "<DBUSER>"`
   4. The application should create any apropriate database fields on bootup!
+
+## Changing data models
+
+  1. Create a migration via `create_migration.sh` - it takes one parameter - the name of the migration. (TODO: make this work on windows)
+  2. Create/Alter a table
+  3. Ensure you have a configured `sqlboiler.sample.toml` file
+  4. Run `sqlboiler psql -o datamodels_raw -p datamodels_raw` from the root of the repo

@@ -4,7 +4,9 @@
 package datamodels_raw
 
 var TableNames = struct {
-	Users string
+	Domains string
+	Users   string
 }{
-	Users: "users",
+	Domains: "domains",
+	Users:   "users",
 }

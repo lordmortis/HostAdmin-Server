@@ -6,5 +6,5 @@
     pkgname = "datamodels"
     output = "datamodels"
     host = <HOSTNAME>
-    port = 5442
+    port = 5432
     sslmode = "disable"
