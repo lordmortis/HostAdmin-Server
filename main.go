@@ -65,10 +65,20 @@ func main() {
 	domainGroup.Use(authMiddleware)
 	controllers.Domains(domainGroup)
 
+	pingGroup := router.Group("/ping")
+	pingGroup.Use(authMiddleware)
+	pingGroup.GET("", ping)
+
 	err = router.Run(conf.Server.String())
 	if err != nil {
 		fmt.Println("Unable to start server")
 		fmt.Println(err)
 		return
 	}
+}
+
+func ping(ctx *gin.Context) {
+	controllers.JSONOk(ctx, gin.H{
+		"pong": true,
+	})
 }
