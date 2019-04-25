@@ -4,79 +4,56 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
+	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"net/http"
-
-	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
 
-func Users(router gin.IRoutes) {
-	router.GET("", listUsers)
-	router.POST("", createUsers)
-	router.GET("/:id", showUsers)
-	router.PUT("/:id", updateUsers)
-	router.DELETE("/:id", deleteUsers)
+func Domains(router gin.IRoutes) {
+	router.GET("", listDomains)
+	router.POST("", createDomain)
+	router.GET("/:id", showDomain)
+	router.PUT("/:id", updateDomain)
+	router.DELETE("/:id", deleteDomain)
 }
 
-func listUsers(ctx *gin.Context) {
+func listDomains(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 
-	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
+	dbModels, err := datamodels_raw.Domains().All(ctx, dbCon)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	viewModels := make([]viewmodels.User, len(dbModels))
+	viewModels := make([]viewmodels.Domain, len(dbModels))
 	for index := range dbModels {
-		viewModel := viewmodels.User{}
+		viewModel := viewmodels.Domain{}
 		viewModel.FromDB(dbModels[index])
 		viewModels[index] = viewModel
 	}
 
 	JSONOk(ctx, viewModels)
- }
-
-func showUsers(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
- 	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
-	if err != nil {
-		if err == datamodels.UUIDParseError {
-			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
-		} else {
-			JSONInternalServerError(ctx, err)
-		}
-		return
-	}
-
-	if dbModel == nil {
-		JSONNotFound(ctx)
-		return
-	}
-
-	viewModel := viewmodels.User{}
-	viewModel.FromDB(dbModel)
-	JSONOk(ctx, viewModel)
 }
 
-func createUsers(ctx *gin.Context) {
+func createDomain(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	newJson := viewmodels.User{}
+	newJson := viewmodels.Domain{}
 
 	if err := ctx.ShouldBindJSON(&newJson); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
 		return
 	}
 
-	modelErrors := newJson.ValidateCreate()
+	modelErrors := newJson.ValidateUpdate()
 	if len(modelErrors) > 0 {
 		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
-	dbModel := datamodels_raw.User{}
+	dbModel := datamodels_raw.Domain{}
 	newJson.ToDB(&dbModel)
 
 	if err := dbModel.Insert(ctx, dbCon, boil.Infer()); err != nil {
@@ -89,14 +66,14 @@ func createUsers(ctx *gin.Context) {
 		return
 	}
 
-	newJson = viewmodels.User{}
+	newJson = viewmodels.Domain{}
 	newJson.FromDB(&dbModel)
 	JSONOk(ctx, newJson)
 }
 
-func updateUsers(ctx *gin.Context) {
+func showDomain(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
+	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
 		if err == datamodels.UUIDParseError {
 			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
@@ -111,26 +88,42 @@ func updateUsers(ctx *gin.Context) {
 		return
 	}
 
-	updateUserJSON := viewmodels.User{}
-	if err := ctx.ShouldBindJSON(&updateUserJSON); err != nil {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
+	viewModel := viewmodels.Domain{}
+	viewModel.FromDB(dbModel)
+	JSONOk(ctx, viewModel)
+}
+
+func updateDomain(ctx *gin.Context) {
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
+	if err != nil {
+		if err == datamodels.UUIDParseError {
+			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
+		} else {
+			JSONInternalServerError(ctx, err)
+		}
 		return
 	}
 
-	modelErrors := updateUserJSON.ValidateUpdate()
+	if dbModel == nil {
+		JSONNotFound(ctx)
+		return
+	}
+
+	updateJson := viewmodels.Domain{}
+
+	if err := ctx.ShouldBindJSON(&updateJson); err != nil {
+		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
+		return
+	}
+
+	modelErrors := updateJson.ValidateUpdate()
 	if len(modelErrors) > 0 {
 		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
-	if len(updateUserJSON.NewPassword) > 0 {
-		if !datamodels.UserValidatePassword(dbModel, updateUserJSON.OldPassword) {
-			JSONBadRequest(ctx, gin.H{"current_password": [1]string{"not set or incorrect"}})
-			return
-		}
-	}
-
-	updateUserJSON.ToDB(dbModel)
+	updateJson.ToDB(dbModel)
 
 	rows, err := dbModel.Update(ctx, dbCon, boil.Infer())
 	if err != nil {
@@ -139,18 +132,18 @@ func updateUsers(ctx *gin.Context) {
 		return
 	}
 
-	updateUserJSON = viewmodels.User{}
-	updateUserJSON.FromDB(dbModel)
+	updateJson = viewmodels.Domain{}
+	updateJson.FromDB(dbModel)
 	if rows == 1 {
-		JSONOk(ctx, updateUserJSON)
+		JSONOk(ctx, updateJson)
 	} else {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{"no rows updated"}})
 	}
 }
 
-func deleteUsers(ctx *gin.Context) {
+func deleteDomain(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
+	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -171,6 +164,6 @@ func deleteUsers(ctx *gin.Context) {
 	if rows == 1 {
 		JSONOkStatusResponse(ctx)
 	} else {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to deleteUsers"}})
+		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to delete domain"}})
 	}
 }

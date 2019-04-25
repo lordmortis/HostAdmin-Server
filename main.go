@@ -56,9 +56,14 @@ func main() {
 
 	loginGroup := router.Group("/1/login")
 	controllers.Login(loginGroup)
+
 	userGroup := router.Group("/1/users")
 	userGroup.Use(authMiddleware)
 	controllers.Users(userGroup)
+
+	domainGroup := router.Group("/1/domains")
+	domainGroup.Use(authMiddleware)
+	controllers.Domains(domainGroup)
 
 	err = router.Run(conf.Server.String())
 	if err != nil {

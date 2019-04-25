@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/volatiletech/null"
 	"golang.org/x/crypto/bcrypt"
 

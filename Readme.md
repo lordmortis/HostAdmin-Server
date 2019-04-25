@@ -5,6 +5,8 @@
 
   * [Golang development environment](https://golang.org/dl/)
   * Postgres 10 server
+  
+Also recommended is [fresh](https://github.com/gravityblast/fresh) for automatic recompiling.
 
 ## Downloading 
 

@@ -3,7 +3,7 @@ package datamodels
 import (
 	"encoding/base64"
 	"errors"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 var UUIDParseError = errors.New("unable to parse UUID")

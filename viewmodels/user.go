@@ -3,7 +3,7 @@ package viewmodels
 import (
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"regexp"
 	"time"
 )
@@ -88,7 +88,8 @@ func (user *User) ValidateUpdate() map[string]interface{} {
 
 func (user *User) ToDB(dbModel *datamodels_raw.User) {
 	if len(dbModel.ID) == 0 {
-		dbModel.ID = uuid.NewV4().String()
+		id, _ := uuid.NewV4()
+		dbModel.ID = id.String()
 	}
 
 	if len(user.Email) > 0 {

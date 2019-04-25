@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"math"
 	"net/http"
 	"strings"
@@ -77,7 +77,7 @@ func AuthCreateSession(ctx *gin.Context, model string, modelID []byte) (*Session
 	redisClient := ctx.MustGet("redisConnection").(*redis.Client)
 	redisPrefix := ctx.MustGet("redisPrefix").(string)
 
-	sessionID := uuid.NewV4()
+	sessionID, _ := uuid.NewV4()
 	base64ID := base64.StdEncoding.EncodeToString(sessionID.Bytes())
 
 	redisSession := redisSession{model, modelID}
