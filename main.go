@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"runtime"
 
@@ -51,6 +52,7 @@ func main() {
 	authMiddleware := middleware.Auth()
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Use(dbMiddleware)
 	router.Use(redisMiddleware)
 
