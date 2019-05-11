@@ -52,7 +52,11 @@ func main() {
 	authMiddleware := middleware.Auth()
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = conf.Server.AllowedOrigins
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowHeaders = []string{"Content-Type", "Authorization"}
+	router.Use(cors.New(corsConfig))
 	router.Use(dbMiddleware)
 	router.Use(redisMiddleware)
 

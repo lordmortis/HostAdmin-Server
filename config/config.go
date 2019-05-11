@@ -24,6 +24,7 @@ type RedisConfig struct {
 
 type ServerConfig struct {
 	BindAddress string
+	AllowedOrigins []string
 	Port int
 }
 
@@ -46,6 +47,7 @@ func defaultConfig() Config {
 	config.Redis.Port = 6379
 	config.Redis.Database = 0
 	config.Server.BindAddress = "127.0.0.1"
+	config.Server.AllowedOrigins = []string{"http://localhost:3001"}
 	config.Server.Port = 3000
 	config.Logging.Level = "info"
 	return config
@@ -63,7 +65,7 @@ func Load(filename *string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
 	return &config, nil
 }
 
