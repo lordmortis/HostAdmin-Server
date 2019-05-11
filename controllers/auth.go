@@ -71,3 +71,17 @@ func login(ctx *gin.Context) {
 		"expiry": session.Expiry.Format(time.RFC3339),
 	})
 }
+
+func SessionKeepalive(router gin.IRoutes) {
+	router.GET("", sessionKeepalive)
+}
+
+func sessionKeepalive(ctx *gin.Context) {
+	sessionID := ctx.MustGet("SessionID").(string)
+	expiryTime := ctx.MustGet("ExpiryTime").(time.Time)
+
+	JSONOk(ctx, gin.H{
+		"sessionID": sessionID,
+		"expiry": expiryTime.Format(time.RFC3339),
+	})
+}

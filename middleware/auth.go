@@ -98,6 +98,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
+		expiryTime := time.Now().Add(expiryDuration)
 		redisClient.Set(redisPrefix + "session:" + sessionID, data, expiryDuration)
 
 		maxAge := int(math.Round(expiryDuration.Seconds()))
@@ -106,6 +107,8 @@ func Auth() gin.HandlerFunc {
 
 		ctx.Set("AuthModelType", redisSession.Model)
 		ctx.Set("AuthModelID", redisSession.ModelID)
+		ctx.Set("SessionID", sessionID)
+		ctx.Set("ExpiryTime", expiryTime)
 
 		_ = dbCon
 	}
