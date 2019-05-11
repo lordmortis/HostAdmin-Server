@@ -143,3 +143,11 @@ func AuthCreateSession(ctx *gin.Context, model string, modelID []byte) (*Session
 	session := Session{sessionID, base64ID, time.Now().Add(expiryDuration),  model, modelID}
 	return &session, nil
 }
+
+func AuthDestroySession(ctx *gin.Context) {
+	redisClient := ctx.MustGet("redisConnection").(*redis.Client)
+	redisPrefix := ctx.MustGet("redisPrefix").(string)
+	sessionID := ctx.MustGet("SessionID").(string)
+
+	redisClient.Del(redisPrefix + "session:" + sessionID)
+}

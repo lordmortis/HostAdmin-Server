@@ -14,10 +14,10 @@ import (
 )
 
 func Login(router gin.IRoutes) {
-	router.POST("", login)
+	router.POST("", authLogin)
 }
 
-func login(ctx *gin.Context) {
+func authLogin(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 
 	loginData := viewmodels.Login{}
@@ -72,11 +72,17 @@ func login(ctx *gin.Context) {
 	})
 }
 
-func SessionKeepalive(router gin.IRoutes) {
-	router.GET("", sessionKeepalive)
+func Auth(router gin.IRoutes) {
+	router.POST("/logout", authLogout)
+	router.GET("/keepalive", authKeepAlive)
 }
 
-func sessionKeepalive(ctx *gin.Context) {
+func authLogout(ctx *gin.Context) {
+	middleware.AuthDestroySession(ctx)
+	JSONOkStatusResponse(ctx)
+}
+
+func authKeepAlive(ctx *gin.Context) {
 	sessionID := ctx.MustGet("SessionID").(string)
 	expiryTime := ctx.MustGet("ExpiryTime").(time.Time)
 

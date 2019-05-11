@@ -63,9 +63,9 @@ func main() {
 	loginGroup := router.Group("/1/login")
 	controllers.Login(loginGroup)
 
-	sessionKeepalive := router.Group("/1/session_keepalive")
+	sessionKeepalive := router.Group("/1/auth")
 	sessionKeepalive.Use(authMiddleware)
-	controllers.SessionKeepalive(sessionKeepalive)
+	controllers.Auth(sessionKeepalive)
 
 	userGroup := router.Group("/1/users")
 	userGroup.Use(authMiddleware)
