@@ -14,15 +14,25 @@ func PerformMigrations(config config.DatabaseConfig) error {
 	var connString = "postgres://" + config.Username + ":" + config.Password
 	connString += "@" + config.Hostname + ":" + strconv.Itoa(config.Port)
 	connString += "/" + config.Database + "?sslmode=disable"
-	m, err := migrate.New("file://datasource/migrations/", connString)
+	m, err := migrate.New("file://datasource/migrations", connString)
 	if err != nil {
 		return err
 	}
-
+	
 	err = m.Up()
-	_ = err
-	// TODO: handle errors with migrations...
+	if err != nil && err != migrate.ErrNoChange{
+		return err
+	}
 
-	m.Close()
+	srcErr, dstErr := m.Close()
+
+	if srcErr != nil {
+		return srcErr
+	}
+
+	if dstErr != nil {
+		return dstErr
+	}
+
 	return nil
 }
