@@ -10,8 +10,8 @@ import (
 
 type User struct {
 	ID string `json:"id"`
-	Username string
-	Email string
+	Username string `json:"username"`
+	Email string `json:"email"`
 	OldPassword string `json:"current_password,omitempty"`
 	NewPassword string `json:"new_password,omitempty"`
 	PasswordConfirmation string `json:"password_confirmation,omitempty"`
