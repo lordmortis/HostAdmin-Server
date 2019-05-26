@@ -22,6 +22,16 @@ func JSONOk(ctx *gin.Context, response interface{}) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+func JSONOkTable(ctx *gin.Context, models interface{}, total int64) {
+	response := gin.H{
+		"models": models,
+		"meta": gin.H {
+			"total": total,
+		},
+	}
+	ctx.JSON(http.StatusOK, response)
+}
+
 func JSONOkStatusResponse(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status" : "ok"})
 }

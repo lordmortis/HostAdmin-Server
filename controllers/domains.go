@@ -22,6 +22,12 @@ func Domains(router gin.IRoutes) {
 func listDomains(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 
+	count, err := datamodels_raw.Domains().Count(ctx, dbCon)
+	if err != nil {
+		JSONInternalServerError(ctx, err)
+		return
+	}
+
 	dbModels, err := datamodels_raw.Domains().All(ctx, dbCon)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
@@ -35,7 +41,7 @@ func listDomains(ctx *gin.Context) {
 		viewModels[index] = viewModel
 	}
 
-	JSONOk(ctx, viewModels)
+	JSONOkTable(ctx, viewModels, count)
 }
 
 func createDomain(ctx *gin.Context) {
