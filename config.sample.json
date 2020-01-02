@@ -23,5 +23,6 @@
   },
   "logging": {
     "level": "debug"
-  }
+  },
+  "development": false
 }

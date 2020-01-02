@@ -33,6 +33,7 @@ type LoggingConfig struct {
 }
 
 type Config struct {
+	Development bool
 	Database DatabaseConfig `json:"db"`
 	Redis RedisConfig
 	Server ServerConfig
