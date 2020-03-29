@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+type AuthConfig struct {
+	 SessionExpiry int
+}
+
 type DatabaseConfig struct {
 	Hostname string
 	Port int
@@ -26,6 +30,7 @@ type ServerConfig struct {
 	BindAddress string
 	AllowedOrigins []string
 	Port int
+	SessionExpiry int
 }
 
 type LoggingConfig struct {
@@ -33,6 +38,7 @@ type LoggingConfig struct {
 }
 
 type Config struct {
+	Auth AuthConfig
 	Development bool
 	Database DatabaseConfig `json:"db"`
 	Redis RedisConfig
@@ -50,6 +56,7 @@ func defaultConfig() Config {
 	config.Server.BindAddress = "127.0.0.1"
 	config.Server.AllowedOrigins = []string{"http://localhost:3001"}
 	config.Server.Port = 3000
+	config.Auth.SessionExpiry = 60
 	config.Logging.Level = "info"
 	return config
 }
@@ -66,7 +73,11 @@ func Load(filename *string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
+	if !config.Development {
+		config.Auth.SessionExpiry = 60
+	}
+
 	return &config, nil
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/gofrs/uuid"
+	"github.com/lordmortis/HostAdmin-Server/config"
 	"github.com/pkg/errors"
 	"math"
 	"math/rand"
@@ -46,6 +47,10 @@ func init() {
 	}
 	seed := binary.BigEndian.Uint64(seedBytes)
 	rand.Seed(int64(seed))
+}
+
+func AuthSetConfig(authConfig config.AuthConfig) {
+	expiryDuration = time.Second * time.Duration(authConfig.SessionExpiry)
 }
 
 func Auth() gin.HandlerFunc {

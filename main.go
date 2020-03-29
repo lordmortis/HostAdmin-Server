@@ -50,6 +50,7 @@ func main() {
 	}
 
 	authMiddleware := middleware.Auth()
+	middleware.AuthSetConfig(conf.Auth)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
