@@ -14,6 +14,9 @@ import (
 func Domains(router gin.IRoutes) {
 	router.GET("", listDomains)
 	router.POST("", createDomain)
+}
+
+func Domain(router gin.IRoutes) {
 	router.GET("/:id", showDomain)
 	router.PUT("/:id", updateDomain)
 	router.DELETE("/:id", deleteDomain)

@@ -15,9 +15,12 @@ import (
 func Users(router gin.IRoutes) {
 	router.GET("", listUsers)
 	router.POST("", createUsers)
-	router.GET("/:id", showUsers)
-	router.PUT("/:id", updateUsers)
-	router.DELETE("/:id", deleteUsers)
+}
+
+func User(router gin.IRoutes) {
+	router.GET("/:id", showUser)
+	router.PUT("/:id", updateUser)
+	router.DELETE("/:id", deleteUser)
 }
 
 func listUsers(ctx *gin.Context) {
@@ -39,7 +42,7 @@ func listUsers(ctx *gin.Context) {
 	JSONOk(ctx, viewModels)
  }
 
-func showUsers(ctx *gin.Context) {
+func showUser(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
  	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
@@ -94,7 +97,7 @@ func createUsers(ctx *gin.Context) {
 	JSONOk(ctx, newJson)
 }
 
-func updateUsers(ctx *gin.Context) {
+func updateUser(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
@@ -148,7 +151,7 @@ func updateUsers(ctx *gin.Context) {
 	}
 }
 
-func deleteUsers(ctx *gin.Context) {
+func deleteUser(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 	dbModel, err := datamodels.UserById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
@@ -171,6 +174,6 @@ func deleteUsers(ctx *gin.Context) {
 	if rows == 1 {
 		JSONOkStatusResponse(ctx)
 	} else {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to deleteUsers"}})
+		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to deleteUser"}})
 	}
 }

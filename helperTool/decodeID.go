@@ -35,7 +35,7 @@ func (x *DecodeIDCommand)Execute(args[]string) error {
 		return errors.New("no id provided")
 	}
 
-	reg, err := regexp.Compile("[^a-zA-Z0-9+/]+")
+	reg, err := regexp.Compile("[^a-zA-Z0-9-_]+")
 	if err != nil {
 		return err
 	}
@@ -49,10 +49,6 @@ func (x *DecodeIDCommand)Execute(args[]string) error {
 	case 32:
 		uuidBytes, idtype, err = decodeHex(stringID)
 	case 22:
-		uuidBytes, idtype, err = decodeBase64(stringID)
-	case 23:
-		uuidBytes, idtype, err = decodeBase64(stringID)
-	case 24:
 		uuidBytes, idtype, err = decodeBase64(stringID)
 	default:
 		err = errors.New(fmt.Sprintf("unable to decode provided ID %s", args[0]))
@@ -69,7 +65,7 @@ func (x *DecodeIDCommand)Execute(args[]string) error {
 
 	fmt.Printf("%s is %s\n", stringID, idtype)
 	fmt.Printf("UUID: %s\n", decodedID.String())
-	fmt.Printf("Base64 Encoded: %s\n", base64.StdEncoding.EncodeToString(decodedID.Bytes()))
+	fmt.Printf("Base64 Encoded: %s\n", base64.URLEncoding.EncodeToString(decodedID.Bytes()))
 	fmt.Printf("hex: %s\n", hex.EncodeToString(decodedID.Bytes()))
 	return nil
 }
@@ -84,7 +80,7 @@ func decodeHex(hexString string) ([]byte, string, error) {
 }
 
 func decodeBase64(base64String string) ([]byte, string, error) {
-	uuidBytes, err := base64.RawStdEncoding.DecodeString(base64String)
+	uuidBytes, err := base64.RawURLEncoding.DecodeString(base64String)
 	if err != nil {
 		return nil, "", err
 	}

@@ -17,7 +17,7 @@ func UserUUID(user *datamodels_raw.User) uuid.UUID {
 
 func UserUUIDBase64(user *datamodels_raw.User) string {
 	uuid := UserUUID(user)
-	return base64.StdEncoding.EncodeToString(uuid.Bytes())
+	return base64.RawURLEncoding.EncodeToString(uuid.Bytes())
 }
 
 func UserById(ctx *gin.Context, dbCon *sql.DB, stringID string) (*datamodels_raw.User, error) {

@@ -14,6 +14,15 @@ Also recommended is [fresh](https://github.com/gravityblast/fresh) for automatic
 
 ## Downloading 
 
+## Data Model
+
+### Domains
+  - all domains have a base TLD which is the name (i.e. `sektorseven.net`)
+  - domains can have one or more user accounts associated, with permissions
+    - by default, if a user account is associated with a domain, it can _see_ all the information
+    - admin permission allows users to be added to the domain
+    - email permission allows the modification of email users and forwards    
+
 ## Config file setup
 
   1. Copy `sqlboiler.sample.toml.sample` and `config.sample.json` to new files - removing the `.sample`
@@ -73,5 +82,5 @@ The following sections will make use of the helper tool to create databases and 
       1. `directory` - the root directory of this repository (if the helpertool is being run in the helperTool directory, 
       then this will be either `..\` or `../` depending on your os)
   6. Then generate the models:
-     1. Ensure you have a configured `sqlboiler.sample.toml` file
-     2. Run `sqlboiler psql -o datamodels_raw -p datamodels_raw` from the root of the repo
+     1. Ensure you have copied `sqlboiler.sample.toml` to `sqlboler.toml` and changed the various directives to your local ones.
+     2. Run `sqlboiler psql -o datamodels_raw -p datamodels_raw -c sqlboiler.toml` from the root of the repo.

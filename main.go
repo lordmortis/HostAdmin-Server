@@ -68,13 +68,21 @@ func main() {
 	sessionKeepalive.Use(authMiddleware)
 	controllers.Auth(sessionKeepalive)
 
-	userGroup := router.Group("/1/users")
-	userGroup.Use(authMiddleware)
-	controllers.Users(userGroup)
+	usersGroup := router.Group("/1/users")
+	usersGroup.Use(authMiddleware)
+	controllers.Users(usersGroup)
 
-	domainGroup := router.Group("/1/domains")
+	userGroup := router.Group("/1/user")
+	userGroup.Use(authMiddleware)
+	controllers.User(userGroup)
+
+	domainsGroup := router.Group("/1/domains")
+	domainsGroup.Use(authMiddleware)
+	controllers.Domains(domainsGroup)
+
+	domainGroup := router.Group("/1/domain")
 	domainGroup.Use(authMiddleware)
-	controllers.Domains(domainGroup)
+	controllers.Domain(domainGroup)
 
 	err = router.Run(conf.Server.String())
 	if err != nil {
