@@ -5,13 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
+	"github.com/lordmortis/HostAdmin-Server/datasource"
 )
 
 func DomainById(ctx *gin.Context, dbCon *sql.DB, stringID string) (*datamodels_raw.Domain, error) {
-	id := UUIDFromString(stringID)
+	id := datasource.UUIDFromString(stringID)
 
 	if id == uuid.Nil {
-		return nil, UUIDParseError
+		return nil, datasource.UUIDParseError
 	}
 
 	user, err := datamodels_raw.FindDomain(ctx,dbCon, id.String())

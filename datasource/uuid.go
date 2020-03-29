@@ -1,4 +1,4 @@
-package datamodels
+package datasource
 
 import (
 	"encoding/base64"
@@ -21,6 +21,18 @@ func init() {
 	}
 }
 
+func UUIDStringToUUID(uuidString string) uuid.UUID {
+	return uuid.FromStringOrNil(uuidString)
+}
+
+func UUIDToBase64(uuidValue uuid.UUID) string {
+	return base64.RawURLEncoding.EncodeToString(uuidValue.Bytes())
+}
+
+func UUIDStringToBase64(uuidString string) string {
+	uuidVal := uuid.FromStringOrNil(uuidString)
+	return base64.RawURLEncoding.EncodeToString(uuidVal.Bytes())
+}
 
 func UUIDFromString(uuidString string) uuid.UUID {
 	var realUUID uuid.UUID

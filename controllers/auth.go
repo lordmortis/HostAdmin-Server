@@ -3,8 +3,8 @@ package controllers
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
+	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/lordmortis/HostAdmin-Server/middleware"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/pkg/errors"
@@ -59,7 +59,7 @@ func authLogin(ctx *gin.Context) {
 		return
 	}
 
-	var userIDBytes = datamodels.UUIDFromString(dbModels[0].ID).Bytes()
+	var userIDBytes = datasource.UUIDFromString(dbModels[0].ID).Bytes()
 	session, err := middleware.AuthCreateSession(ctx, "User", userIDBytes)
 	if err != nil {
 		JSONInternalServerError(ctx, err)

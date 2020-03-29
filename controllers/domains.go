@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
+	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
@@ -84,7 +85,7 @@ func showDomain(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
-		if err == datamodels.UUIDParseError {
+		if err == datasource.UUIDParseError {
 			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
 		} else {
 			JSONInternalServerError(ctx, err)
@@ -106,7 +107,7 @@ func updateDomain(ctx *gin.Context) {
 	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
 	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
 	if err != nil {
-		if err == datamodels.UUIDParseError {
+		if err == datasource.UUIDParseError {
 			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
 		} else {
 			JSONInternalServerError(ctx, err)
