@@ -2,7 +2,6 @@ package viewmodels
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/lordmortis/HostAdmin-Server/datamodels"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"time"
 )
@@ -23,9 +22,8 @@ func init() {
 //	nameRegexp = regexp.MustCompile("^(((?!-))(xn--|_{1,1})?[a-z0-9-]{0,61}[a-z0-9]{1,1}.)*(xn--)?([a-z0-9-]{1,61}|[a-z0-9-]{1,30}.[a-z]{2,})$")
 }
 
-
 func (domain *Domain)FromDB(dbModel *datamodels_raw.Domain) {
-	domain.ID = datamodels.UUIDFromString(dbModel.ID).String()
+	domain.ID = UUIDStringToBase64(dbModel.ID)
 	domain.Name = dbModel.Name
 	if dbModel.CreatedAt.Valid {
 		domain.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)
@@ -48,7 +46,6 @@ func (domain *Domain)ValidateUpdate() map[string]interface{} {
 
 	return errorMap
 }
-
 
 func (domain *Domain)ToDB(dbModel *datamodels_raw.Domain) {
 	if len(dbModel.ID) == 0 {

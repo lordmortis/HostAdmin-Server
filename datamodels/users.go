@@ -2,7 +2,6 @@ package datamodels
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/volatiletech/null"
@@ -10,15 +9,6 @@ import (
 
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
-
-func UserUUID(user *datamodels_raw.User) uuid.UUID {
-	return uuid.FromStringOrNil(user.ID)
-}
-
-func UserUUIDBase64(user *datamodels_raw.User) string {
-	uuid := UserUUID(user)
-	return base64.RawURLEncoding.EncodeToString(uuid.Bytes())
-}
 
 func UserById(ctx *gin.Context, dbCon *sql.DB, stringID string) (*datamodels_raw.User, error) {
 	userID := UUIDFromString(stringID)

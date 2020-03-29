@@ -28,7 +28,7 @@ func init() {
 }
 
 func (user *User)FromDB(dbModel *datamodels_raw.User) {
-	user.ID = datamodels.UserUUIDBase64(dbModel)
+	user.ID = UUIDStringToBase64(dbModel.ID)
 	user.Username = dbModel.Username
 	user.Email = dbModel.Email
 
