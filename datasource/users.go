@@ -243,7 +243,10 @@ func UserWithIDString(ctx *gin.Context, stringID string) (*User, error) {
 }
 
 func UserWithUUID(ctx *gin.Context, id uuid.UUID) (*User, error) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	if id == uuid.Nil {
 		return nil, UUIDParseError

@@ -1,15 +1,10 @@
 package controllers
 
 import (
-	"database/sql"
 	"github.com/gin-gonic/gin"
-	"github.com/lordmortis/HostAdmin-Server/datamodels"
-	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
+	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
-	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/pkg/errors"
-	"github.com/volatiletech/sqlboiler/boil"
-	"net/http"
 )
 
 func Domains(router gin.IRoutes) {
@@ -18,160 +13,134 @@ func Domains(router gin.IRoutes) {
 }
 
 func Domain(router gin.IRoutes) {
-	router.GET("/:id", showDomain)
-	router.PUT("/:id", updateDomain)
-	router.DELETE("/:id", deleteDomain)
+	router.GET("", showDomain)
+	router.PUT("", updateDomain)
+	router.DELETE("", deleteDomain)
 }
 
 func listDomains(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-
-	count, err := datamodels_raw.Domains().Count(ctx, dbCon)
+	//TODO: Validate user permissions
+	models, count, err := datasource.DomainsAll(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	dbModels, err := datamodels_raw.Domains().All(ctx, dbCon)
-	if err != nil {
-		JSONInternalServerError(ctx, err)
-		return
-	}
-
-	viewModels := make([]viewmodels.Domain, len(dbModels))
-	for index := range dbModels {
-		viewModel := viewmodels.Domain{}
-		viewModel.FromDB(dbModels[index])
-		viewModels[index] = viewModel
-	}
-
-	JSONOkTable(ctx, viewModels, count)
+	JSONOkTable(ctx, models, count)
 }
 
 func createDomain(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	newJson := viewmodels.Domain{}
+	//TODO: Validate user permissions
+	model := datasource.Domain{}
 
-	if err := ctx.ShouldBindJSON(&newJson); err != nil {
+	if err := ctx.ShouldBindJSON(&model); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
 		return
 	}
 
-	modelErrors := newJson.ValidateUpdate()
+	modelErrors := model.ValidateUpdate()
 	if len(modelErrors) > 0 {
 		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
-	dbModel := datamodels_raw.Domain{}
-	newJson.ToDB(&dbModel)
-
-	if err := dbModel.Insert(ctx, dbCon, boil.Infer()); err != nil {
+	_, err := model.Update(ctx)
+	if err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
 		return
 	}
 
-	if err := dbModel.Reload(ctx, dbCon); err != nil {
+	JSONOk(ctx, model)
+}
+
+func showDomain(ctx *gin.Context) {
+	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
+		return
+	}
+
+	model, err := datasource.DomainWithID(ctx, modelID)
+	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	newJson = viewmodels.Domain{}
-	newJson.FromDB(&dbModel)
-	JSONOk(ctx, newJson)
-}
-
-func showDomain(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
-	if err != nil {
-		if err == datasource.UUIDParseError {
-			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
-		} else {
-			JSONInternalServerError(ctx, err)
-		}
-		return
-	}
-
-	if dbModel == nil {
+	if model == nil {
 		JSONNotFound(ctx)
 		return
 	}
 
-	viewModel := viewmodels.Domain{}
-	viewModel.FromDB(dbModel)
-	JSONOk(ctx, viewModel)
+	JSONOk(ctx, model)
 }
 
 func updateDomain(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
-	if err != nil {
-		if err == datasource.UUIDParseError {
-			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
-		} else {
-			JSONInternalServerError(ctx, err)
-		}
+	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
 		return
 	}
 
-	if dbModel == nil {
+	model, err := datasource.DomainWithID(ctx, modelID)
+	if err != nil {
+		JSONInternalServerError(ctx, err)
+		return
+	}
+
+	if model == nil {
 		JSONNotFound(ctx)
 		return
 	}
 
-	updateJson := viewmodels.Domain{}
-
-	if err := ctx.ShouldBindJSON(&updateJson); err != nil {
+	if err := ctx.ShouldBindJSON(&model); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
 		return
 	}
 
-	modelErrors := updateJson.ValidateUpdate()
+	modelErrors := model.ValidateUpdate()
 	if len(modelErrors) > 0 {
 		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
-	updateJson.ToDB(dbModel)
-
-	rows, err := dbModel.Update(ctx, dbCon, boil.Infer())
+	_, err = model.Update(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		_ = ctx.Error(err)
 		return
 	}
 
-	updateJson = viewmodels.Domain{}
-	updateJson.FromDB(dbModel)
-	if rows == 1 {
-		JSONOk(ctx, updateJson)
-	} else {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{"no rows updated"}})
-	}
+	JSONOk(ctx, model)
 }
 
 func deleteDomain(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-	dbModel, err := datamodels.DomainById(ctx, dbCon, ctx.Param("id"))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
 		return
 	}
 
-	if dbModel == nil {
-		JSONNotFound(ctx)
-		return
-	}
-
-	rows, err := dbModel.Delete(ctx, dbCon)
-
+	model, err := datasource.DomainWithID(ctx, modelID)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	if rows == 1 {
+	if model == nil {
+		JSONNotFound(ctx)
+		return
+	}
+
+	deleted, err := model.Delete(ctx)
+	if err != nil {
+		JSONInternalServerError(ctx, err)
+		return
+	}
+
+	if deleted {
 		JSONOkStatusResponse(ctx)
 	} else {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to delete domain"}})

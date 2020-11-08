@@ -19,6 +19,8 @@ func User(router gin.IRoutes) {
 }
 
 func listUsers(ctx *gin.Context) {
+	//TODO: Validate user permissions
+
 	var models []datasource.User
 
 	models, err := datasource.UsersAll(ctx)
@@ -31,7 +33,9 @@ func listUsers(ctx *gin.Context) {
  }
 
 func showUser(ctx *gin.Context) {
- 	model, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
+	//TODO: Validate user permissions
+
+	model, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
 	if err != nil {
 		if err == datasource.UUIDParseError {
 			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
@@ -50,6 +54,8 @@ func showUser(ctx *gin.Context) {
 }
 
 func createUsers(ctx *gin.Context) {
+	//TODO: Validate user permissions
+
 	user := datasource.User{}
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
@@ -73,6 +79,8 @@ func createUsers(ctx *gin.Context) {
 }
 
 func updateUser(ctx *gin.Context) {
+	//TODO: Validate user permissions
+
 	user, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
 	if err != nil {
 		if err == datasource.UUIDParseError {
@@ -116,6 +124,8 @@ func updateUser(ctx *gin.Context) {
 }
 
 func deleteUser(ctx *gin.Context) {
+	//TODO: Validate user permissions
+
 	user, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
