@@ -1,13 +1,10 @@
 package controllers
 
 import (
-	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/pkg/errors"
 	"net/http"
-
-	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 )
 
 func Users(router gin.IRoutes) {
@@ -22,25 +19,19 @@ func User(router gin.IRoutes) {
 }
 
 func listUsers(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	var models []datasource.User
 
-	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
+	models, err := datasource.UsersAll(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
-	viewModels := make([]datasource.User, len(dbModels))
-	for index := range dbModels {
-		viewModel := datasource.User{}
-		viewModel.FromDB(dbModels[index])
-		viewModels[index] = viewModel
-	}
 
-	JSONOk(ctx, viewModels)
+	JSONOk(ctx, models)
  }
 
 func showUser(ctx *gin.Context) {
- 	user, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
+ 	model, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
 	if err != nil {
 		if err == datasource.UUIDParseError {
 			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
@@ -50,12 +41,12 @@ func showUser(ctx *gin.Context) {
 		return
 	}
 
-	if user == nil {
+	if model == nil {
 		JSONNotFound(ctx)
 		return
 	}
 
-	JSONOk(ctx, user)
+	JSONOk(ctx, model)
 }
 
 func createUsers(ctx *gin.Context) {

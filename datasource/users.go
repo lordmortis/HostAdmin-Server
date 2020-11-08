@@ -50,6 +50,24 @@ func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserS
 	return models, err
 }
 
+func UsersAll(ctx *gin.Context) ([]User, error){
+	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+
+	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
+	if err != nil {
+		return nil, err
+	}
+
+	viewModels := make([]User, len(dbModels))
+	for index := range dbModels {
+		viewModel := User{}
+		viewModel.FromDB(dbModels[index])
+		viewModels[index] = viewModel
+	}
+
+	return viewModels, nil
+}
+
 func (user *User)FromDB(dbModel *datamodels_raw.User) {
 	user.uuid = UUIDFromString(dbModel.ID)
 	user.dbModel = dbModel
