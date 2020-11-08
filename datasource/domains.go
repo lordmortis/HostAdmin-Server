@@ -29,7 +29,10 @@ func init() {
 }
 
 func DomainsAll(ctx *gin.Context) ([]Domain, int64, error){
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return nil, -1, err
+	}
 
 	count, err := datamodels_raw.Domains().Count(ctx, dbCon)
 	if err != nil {
@@ -52,7 +55,10 @@ func DomainsAll(ctx *gin.Context) ([]Domain, int64, error){
 }
 
 func DomainWithID(ctx *gin.Context, id uuid.UUID) (*Domain, error) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	dbModel, err := datamodels_raw.FindDomain(ctx, dbCon, id.String())
 	if err != nil {
@@ -81,8 +87,13 @@ func (model *Domain)ValidateUpdate() map[string]interface{} {
 }
 
 func (model *Domain)Update(ctx *gin.Context) (bool, error) {
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
 	insert := false
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+
 	if model.dbModel == nil {
 		insert = true
 		model.dbModel = &datamodels_raw.Domain{}

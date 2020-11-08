@@ -50,8 +50,11 @@ func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserS
 	return models, err
 }
 
-func UsersAll(ctx *gin.Context) ([]User, error){
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+func UsersAll(ctx *gin.Context) ([]User, error) {
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
 	if err != nil {
@@ -61,14 +64,14 @@ func UsersAll(ctx *gin.Context) ([]User, error){
 	viewModels := make([]User, len(dbModels))
 	for index := range dbModels {
 		viewModel := User{}
-		viewModel.FromDB(dbModels[index])
+		viewModel.fromDB(dbModels[index])
 		viewModels[index] = viewModel
 	}
 
 	return viewModels, nil
 }
 
-func (user *User)FromDB(dbModel *datamodels_raw.User) {
+func (user *User) fromDB(dbModel *datamodels_raw.User) {
 	user.uuid = UUIDFromString(dbModel.ID)
 	user.dbModel = dbModel
 
@@ -85,7 +88,7 @@ func (user *User)FromDB(dbModel *datamodels_raw.User) {
 	}
 }
 
-func (user *User) ToDB(dbModel *datamodels_raw.User) {
+func (user *User) toDB(dbModel *datamodels_raw.User) {
 	if len(dbModel.ID) == 0 {
 		id, _ := uuid.NewV4()
 		dbModel.ID = id.String()
@@ -105,35 +108,40 @@ func (user *User) ToDB(dbModel *datamodels_raw.User) {
 }
 
 func (user *User)Update(ctx *gin.Context) (bool, error) {
-	modified := false
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
 	insert := false
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+
 	if user.dbModel == nil {
 		insert = true
-		modified = true
 		user.dbModel = &datamodels_raw.User{}
 		user.uuid, _ = uuid.NewV4()
 		user.ID = UUIDToBase64(user.uuid)
 		user.dbModel.ID = user.uuid.String()
-	}
+	} else {
+		modified := false
 
-	if user.dbModel.Email != user.Email {
-		modified = true
-		user.dbModel.Email = user.Email
-	}
+		if user.dbModel.Email != user.Email {
+			modified = true
+			user.dbModel.Email = user.Email
+		}
 
-	if user.dbModel.Username != user.Username {
-		modified = true
-		user.dbModel.Username = user.Username
-	}
+		if user.dbModel.Username != user.Username {
+			modified = true
+			user.dbModel.Username = user.Username
+		}
 
-	if len(user.NewPassword) > 0 && len(user.PasswordConfirmation) > 0 && user.NewPassword == user.PasswordConfirmation {
-		modified = true
-		user.SetPassword(user.NewPassword)
-	}
+		if len(user.NewPassword) > 0 && len(user.PasswordConfirmation) > 0 && user.NewPassword == user.PasswordConfirmation {
+			modified = true
+			user.SetPassword(user.NewPassword)
+		}
 
-	if !modified {
-		return false, nil
+		if !modified {
+			return false, nil
+		}
 	}
 
 	if insert {
@@ -156,8 +164,8 @@ func (user *User)Update(ctx *gin.Context) (bool, error) {
 		return false, err
 	}
 
-	user.FromDB(user.dbModel)
-	return modified, nil
+	user.fromDB(user.dbModel)
+	return true, nil
 }
 
 func (user *User) ValidateCreate() map[string]interface{} {
@@ -223,7 +231,10 @@ func (user *User)ValidatePassword(password string) bool {
 }
 
 func (user *User)Delete(ctx *gin.Context) (bool, error) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
+	dbCon, err := dbFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
 
 	rows, err := user.dbModel.Delete(ctx, dbCon)
 	if err != nil {
@@ -235,11 +246,6 @@ func (user *User)Delete(ctx *gin.Context) (bool, error) {
 	} else {
 		return true, nil
 	}
-}
-
-func UserWithIDString(ctx *gin.Context, stringID string) (*User, error) {
-	userID := UUIDFromString(stringID)
-	return UserWithUUID(ctx, userID)
 }
 
 func UserWithUUID(ctx *gin.Context, id uuid.UUID) (*User, error) {
@@ -261,7 +267,7 @@ func UserWithUUID(ctx *gin.Context, id uuid.UUID) (*User, error) {
 	}
 
 	model := User{}
-	model.FromDB(dbModel)
+	model.fromDB(dbModel)
 
 	return &model, nil
 }
