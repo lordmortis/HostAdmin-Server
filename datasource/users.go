@@ -7,6 +7,7 @@ import (
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 	"time"
@@ -32,6 +33,21 @@ var (
 
 func init() {
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+}
+
+func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserSlice, error){
+	dbCon, err := dbFromContext(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	models, err := datamodels_raw.Users(qm.Where("username = ?", username)).All(ctx, dbCon)
+	if err == sql.ErrNoRows {
+		return nil, ErrNoResults
+	}
+
+	return models, err
 }
 
 func (user *User)FromDB(dbModel *datamodels_raw.User) {

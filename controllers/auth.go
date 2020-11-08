@@ -3,12 +3,9 @@ package controllers
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/lordmortis/HostAdmin-Server/middleware"
-	"github.com/lordmortis/HostAdmin-Server/viewmodels"
 	"github.com/pkg/errors"
-	"github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -18,9 +15,7 @@ func Login(router gin.IRoutes) {
 }
 
 func authLogin(ctx *gin.Context) {
-	dbCon := ctx.MustGet("databaseConnection").(*sql.DB)
-
-	loginData := viewmodels.Login{}
+	loginData := datasource.Login{}
 
 	if err := ctx.ShouldBindJSON(&loginData); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Wrap(err, "parse error").Error()}})
@@ -36,7 +31,7 @@ func authLogin(ctx *gin.Context) {
 	useRealBcrypt := true
 	var hashedPass []byte
 
-	dbModels, err := datamodels_raw.Users(qm.Where("username = ?", loginData.Username)).All(ctx, dbCon)
+	dbModels, err := datasource.UsersWithUsername(ctx, &loginData.Username)
 	if err != nil && err != sql.ErrNoRows {
 		JSONInternalServerError(ctx, err)
 		return

@@ -1,10 +1,9 @@
-package viewmodels
+package datasource
 
 type Login struct {
 	Username string
 	Password string
 }
-
 
 func (login *Login) Validate() map[string]interface{} {
 	errorMap := make(map[string]interface{})
