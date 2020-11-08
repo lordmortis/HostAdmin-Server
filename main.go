@@ -87,6 +87,13 @@ func main() {
 	domainUsersGroup := router.Group("/1/domain/:domain_id/users")
 	domainUsersGroup.Use(authMiddleware)
 	controllers.DomainUsers(domainUsersGroup)
+
+	domainUserGroup := router.Group("/1/domain/:domain_id/user/:user_id")
+	domainUserGroup.Use(authMiddleware)
+	controllers.DomainUser(domainUserGroup)
+
+
+
 	err = router.Run(conf.Server.String())
 	if err != nil {
 		fmt.Println("Unable to start server")

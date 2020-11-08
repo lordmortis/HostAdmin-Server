@@ -4,6 +4,8 @@
 // ../datasource/migrations/1555589258_create_users.up.sql (244B)
 // ../datasource/migrations/1555589937_create_domains.down.sql (21B)
 // ../datasource/migrations/1555589937_create_domains.up.sql (151B)
+// ../datasource/migrations/1585465452_create_domain_users.down.sql (25B)
+// ../datasource/migrations/1585465452_create_domain_users.up.sql (305B)
 
 package migrationData
 
@@ -87,7 +89,7 @@ func _1555589258_create_usersDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1555589258_create_users.down.sql", size: 19, mode: os.FileMode(0666), modTime: time.Unix(1556346534, 0)}
+	info := bindataFileInfo{name: "1555589258_create_users.down.sql", size: 19, mode: os.FileMode(0666), modTime: time.Unix(1584012673, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x3e, 0x16, 0xef, 0x60, 0x8a, 0x67, 0x69, 0x63, 0x7d, 0xcd, 0x2d, 0x38, 0xad, 0xc3, 0x7f, 0x3c, 0xd8, 0xfb, 0xeb, 0x6a, 0xfd, 0xf9, 0x41, 0x2c, 0x23, 0x70, 0x29, 0x6, 0x9a, 0xf6, 0xaa, 0xef}}
 	return a, nil
 }
@@ -107,7 +109,7 @@ func _1555589258_create_usersUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1555589258_create_users.up.sql", size: 244, mode: os.FileMode(0666), modTime: time.Unix(1577950834, 0)}
+	info := bindataFileInfo{name: "1555589258_create_users.up.sql", size: 244, mode: os.FileMode(0666), modTime: time.Unix(1584012673, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x51, 0xc0, 0x73, 0x45, 0xde, 0xfb, 0x75, 0x14, 0x51, 0xc3, 0xeb, 0xd5, 0x8a, 0x2c, 0xdf, 0x12, 0x22, 0xdb, 0x71, 0x9e, 0xdb, 0x3c, 0x60, 0x3c, 0x41, 0xf6, 0xc, 0xc5, 0xf2, 0x53, 0xc7, 0xe3}}
 	return a, nil
 }
@@ -127,7 +129,7 @@ func _1555589937_create_domainsDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1555589937_create_domains.down.sql", size: 21, mode: os.FileMode(0666), modTime: time.Unix(1556346534, 0)}
+	info := bindataFileInfo{name: "1555589937_create_domains.down.sql", size: 21, mode: os.FileMode(0666), modTime: time.Unix(1584012673, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xee, 0x8d, 0x1d, 0x25, 0xa3, 0x7b, 0x22, 0x77, 0xe8, 0x9f, 0xb, 0xca, 0xe6, 0xc5, 0x8e, 0x2b, 0xa3, 0x9f, 0xcc, 0x60, 0xd9, 0xac, 0x27, 0xf4, 0x9b, 0x7c, 0x2f, 0xc1, 0xdc, 0x9b, 0x54, 0xf9}}
 	return a, nil
 }
@@ -147,8 +149,48 @@ func _1555589937_create_domainsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1555589937_create_domains.up.sql", size: 151, mode: os.FileMode(0666), modTime: time.Unix(1556346534, 0)}
+	info := bindataFileInfo{name: "1555589937_create_domains.up.sql", size: 151, mode: os.FileMode(0666), modTime: time.Unix(1584012673, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x9c, 0xd6, 0x4d, 0x4a, 0x31, 0xb9, 0x69, 0x46, 0x2e, 0x95, 0xc3, 0x1b, 0x6, 0x1a, 0xa1, 0xc3, 0x24, 0x5b, 0x17, 0x23, 0xe8, 0x99, 0xb4, 0x4, 0x52, 0x2, 0xe1, 0xb2, 0xce, 0xc5, 0x1d, 0x35}}
+	return a, nil
+}
+
+var __1585465452_create_domain_usersDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\x09\xf2\x0f\x50\x08\x71\x74\xf2\x71\x55\x50\x2a\x2d\x4e\x2d\x8a\x4f\xc9\xcf\x4d\xcc\xcc\x53\xb2\x06\x04\x00\x00\xff\xff\xcf\x77\xdc\x89\x19\x00\x00\x00")
+
+func _1585465452_create_domain_usersDownSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__1585465452_create_domain_usersDownSql,
+		"1585465452_create_domain_users.down.sql",
+	)
+}
+
+func _1585465452_create_domain_usersDownSql() (*asset, error) {
+	bytes, err := _1585465452_create_domain_usersDownSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "1585465452_create_domain_users.down.sql", size: 25, mode: os.FileMode(0666), modTime: time.Unix(1585466002, 0)}
+	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xeb, 0xe6, 0x59, 0xfe, 0x7e, 0x5a, 0xec, 0xd4, 0xe9, 0xe3, 0x83, 0x8e, 0xfe, 0x66, 0xe3, 0x65, 0xee, 0xa3, 0x20, 0x6e, 0xbe, 0x87, 0xbc, 0x30, 0x3a, 0x31, 0x52, 0xc3, 0x43, 0xa3, 0x22, 0xae}}
+	return a, nil
+}
+
+var __1585465452_create_domain_usersUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\xcd\xbb\x6a\x84\x40\x14\xc6\xf1\x5e\xf0\x1d\x3e\xac\x14\x7c\x83\x54\x26\x99\x42\x62\x4c\x10\x2d\xac\xe4\xc4\x39\xc2\xc0\x5c\x64\x2e\xef\x1f\x50\x43\x16\x16\x96\x6d\xe7\xfb\xfd\xe7\xbc\x0d\xa2\x19\x05\xc6\xe6\xb5\x13\x28\x52\x60\xbf\x48\x67\x48\xd9\x02\x65\x9e\x01\xc0\xf1\xa6\x24\xa6\xa9\x7d\x47\xff\x35\xa2\x9f\xba\x0e\x9e\x37\xf6\x6c\x57\x0e\x07\x08\xa5\x92\x55\x7d\x06\x67\xff\x30\x39\xc9\x6d\xf4\x3d\xb4\x9f\xcd\x30\xe3\x43\xcc\xe5\x75\xb1\xfe\xff\xe9\x4f\x91\x34\xca\xe2\xc7\x39\x0d\xeb\x22\x6c\xd2\x1a\x92\x37\x4a\x3a\x62\x23\x1d\xf8\x72\x6c\x48\xe9\x27\xdc\xea\x99\x22\xcb\x85\x22\xa2\x32\x1c\x22\x99\xfd\x9a\xd2\x2e\xef\xa6\x3c\xab\x5e\x7e\x03\x00\x00\xff\xff\x71\xc0\xd9\xe0\x31\x01\x00\x00")
+
+func _1585465452_create_domain_usersUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__1585465452_create_domain_usersUpSql,
+		"1585465452_create_domain_users.up.sql",
+	)
+}
+
+func _1585465452_create_domain_usersUpSql() (*asset, error) {
+	bytes, err := _1585465452_create_domain_usersUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "1585465452_create_domain_users.up.sql", size: 305, mode: os.FileMode(0666), modTime: time.Unix(1585465593, 0)}
+	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x33, 0xa4, 0x9, 0xca, 0xe1, 0x20, 0x58, 0x8e, 0x21, 0xdb, 0x2f, 0xe8, 0x19, 0xa0, 0x18, 0x71, 0x71, 0x6d, 0xe4, 0xb2, 0xe1, 0x5f, 0x11, 0xa6, 0xb3, 0xa6, 0xb3, 0x50, 0xab, 0xfe, 0x14, 0x13}}
 	return a, nil
 }
 
@@ -243,10 +285,12 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"1555589258_create_users.down.sql":   _1555589258_create_usersDownSql,
-	"1555589258_create_users.up.sql":     _1555589258_create_usersUpSql,
-	"1555589937_create_domains.down.sql": _1555589937_create_domainsDownSql,
-	"1555589937_create_domains.up.sql":   _1555589937_create_domainsUpSql,
+	"1555589258_create_users.down.sql":        _1555589258_create_usersDownSql,
+	"1555589258_create_users.up.sql":          _1555589258_create_usersUpSql,
+	"1555589937_create_domains.down.sql":      _1555589937_create_domainsDownSql,
+	"1555589937_create_domains.up.sql":        _1555589937_create_domainsUpSql,
+	"1585465452_create_domain_users.down.sql": _1585465452_create_domain_usersDownSql,
+	"1585465452_create_domain_users.up.sql":   _1585465452_create_domain_usersUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -290,10 +334,12 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"1555589258_create_users.down.sql":   &bintree{_1555589258_create_usersDownSql, map[string]*bintree{}},
-	"1555589258_create_users.up.sql":     &bintree{_1555589258_create_usersUpSql, map[string]*bintree{}},
-	"1555589937_create_domains.down.sql": &bintree{_1555589937_create_domainsDownSql, map[string]*bintree{}},
-	"1555589937_create_domains.up.sql":   &bintree{_1555589937_create_domainsUpSql, map[string]*bintree{}},
+	"1555589258_create_users.down.sql":        &bintree{_1555589258_create_usersDownSql, map[string]*bintree{}},
+	"1555589258_create_users.up.sql":          &bintree{_1555589258_create_usersUpSql, map[string]*bintree{}},
+	"1555589937_create_domains.down.sql":      &bintree{_1555589937_create_domainsDownSql, map[string]*bintree{}},
+	"1555589937_create_domains.up.sql":        &bintree{_1555589937_create_domainsUpSql, map[string]*bintree{}},
+	"1585465452_create_domain_users.down.sql": &bintree{_1585465452_create_domain_usersDownSql, map[string]*bintree{}},
+	"1585465452_create_domain_users.up.sql":   &bintree{_1585465452_create_domain_usersUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory.
