@@ -10,12 +10,13 @@ import (
 )
 
 type Domain struct {
-	ID string `json:"id"`
+	IDBase64 string    `json:"id"`
+	IDUuid   uuid.UUID `json:"-"`
+
 	Name string `json:"name"`
 	CreatedAt string `json:"created_at,omitempty"`
 	UpdatedAt string `json:"updated_at,omitempty"`
 
-	uuid uuid.UUID
 	dbModel *datamodels_raw.Domain
 }
 
@@ -97,9 +98,10 @@ func (model *Domain)Update(ctx *gin.Context) (bool, error) {
 	if model.dbModel == nil {
 		insert = true
 		model.dbModel = &datamodels_raw.Domain{}
-		model.uuid, _ = uuid.NewV4()
-		model.ID = UUIDToBase64(model.uuid)
-		model.dbModel.ID = model.uuid.String()
+		model.IDUuid, _ = uuid.NewV4()
+		model.IDBase64 = UUIDToBase64(model.IDUuid)
+		model.dbModel.ID = model.IDUuid.String()
+		model.dbModel.Name = model.Name
 	} else {
 		modified := false
 
@@ -157,7 +159,9 @@ func (model *Domain)Delete(ctx *gin.Context) (bool, error) {
 
 
 func (model *Domain)fromDB(dbModel *datamodels_raw.Domain) {
-	model.ID = UUIDStringToBase64(dbModel.ID)
+	model.IDBase64 = UUIDStringToBase64(dbModel.ID)
+	model.IDUuid = UUIDFromString(dbModel.ID)
+
 	model.Name = dbModel.Name
 	if dbModel.CreatedAt.Valid {
 		model.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)

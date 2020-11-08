@@ -157,3 +157,24 @@ func deleteUser(ctx *gin.Context) {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to deleteUser"}})
 	}
 }
+
+func fetchUser(ctx *gin.Context) *datasource.User {
+	userID := datasource.UUIDFromString(ctx.Param("user_id"))
+	if userID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse user ID"}})
+		return nil
+	}
+
+	user, err := datasource.UserWithUUID(ctx, userID)
+	if err != nil {
+		JSONInternalServerError(ctx, err)
+		return nil
+	}
+
+	if user == nil {
+		JSONNotFound(ctx)
+		return nil
+	}
+
+	return user
+}

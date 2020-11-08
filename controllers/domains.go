@@ -55,42 +55,17 @@ func createDomain(ctx *gin.Context) {
 
 func showDomain(ctx *gin.Context) {
 	//TODO: Validate user permissions
-	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
-	if modelID == uuid.Nil {
-		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
-		return
-	}
-
-	model, err := datasource.DomainWithID(ctx, modelID)
-	if err != nil {
-		JSONInternalServerError(ctx, err)
-		return
-	}
-
+	model := fetchDomain(ctx)
 	if model == nil {
-		JSONNotFound(ctx)
 		return
 	}
-
 	JSONOk(ctx, model)
 }
 
 func updateDomain(ctx *gin.Context) {
 	//TODO: Validate user permissions
-	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
-	if modelID == uuid.Nil {
-		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
-		return
-	}
-
-	model, err := datasource.DomainWithID(ctx, modelID)
-	if err != nil {
-		JSONInternalServerError(ctx, err)
-		return
-	}
-
+	model := fetchDomain(ctx)
 	if model == nil {
-		JSONNotFound(ctx)
 		return
 	}
 
@@ -105,7 +80,7 @@ func updateDomain(ctx *gin.Context) {
 		return
 	}
 
-	_, err = model.Update(ctx)
+	_, err := model.Update(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		_ = ctx.Error(err)
@@ -117,20 +92,8 @@ func updateDomain(ctx *gin.Context) {
 
 func deleteDomain(ctx *gin.Context) {
 	//TODO: Validate user permissions
-	modelID := datasource.UUIDFromString(ctx.Param("domain_id"))
-	if modelID == uuid.Nil {
-		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
-		return
-	}
-
-	model, err := datasource.DomainWithID(ctx, modelID)
-	if err != nil {
-		JSONInternalServerError(ctx, err)
-		return
-	}
-
+	model := fetchDomain(ctx)
 	if model == nil {
-		JSONNotFound(ctx)
 		return
 	}
 
@@ -145,4 +108,25 @@ func deleteDomain(ctx *gin.Context) {
 	} else {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to delete domain"}})
 	}
+}
+
+func fetchDomain(ctx *gin.Context) *datasource.Domain {
+	domainID := datasource.UUIDFromString(ctx.Param("domain_id"))
+	if domainID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse domain ID"}})
+		return nil
+	}
+
+	domain, err := datasource.DomainWithID(ctx, domainID)
+	if err != nil {
+		JSONInternalServerError(ctx, err)
+		return nil
+	}
+
+	if domain == nil {
+		JSONNotFound(ctx)
+		return nil
+	}
+
+	return domain
 }

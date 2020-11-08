@@ -722,7 +722,7 @@ func testDomainsSelect(t *testing.T) {
 }
 
 var (
-	domainDBTypes = map[string]string{`ID`: `uuid`, `Name`: `character varying`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`}
+	domainDBTypes = map[string]string{`IDBase64`: `uuid`, `Name`: `character varying`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`}
 	_             = bytes.MinRead
 )
 
