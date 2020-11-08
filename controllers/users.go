@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/pkg/errors"
 	"net/http"
@@ -13,9 +14,9 @@ func Users(router gin.IRoutes) {
 }
 
 func User(router gin.IRoutes) {
-	router.GET("/:id", showUser)
-	router.PUT("/:id", updateUser)
-	router.DELETE("/:id", deleteUser)
+	router.GET("", showUser)
+	router.PUT("", updateUser)
+	router.DELETE("", deleteUser)
 }
 
 func listUsers(ctx *gin.Context) {
@@ -34,14 +35,15 @@ func listUsers(ctx *gin.Context) {
 
 func showUser(ctx *gin.Context) {
 	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("user_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
+		return
+	}
 
-	model, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
+	model, err := datasource.UserWithUUID(ctx, modelID)
 	if err != nil {
-		if err == datasource.UUIDParseError {
-			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
-		} else {
-			JSONInternalServerError(ctx, err)
-		}
+		JSONInternalServerError(ctx, err)
 		return
 	}
 
@@ -80,14 +82,15 @@ func createUsers(ctx *gin.Context) {
 
 func updateUser(ctx *gin.Context) {
 	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("user_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
+		return
+	}
 
-	user, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
+	user, err := datasource.UserWithUUID(ctx, modelID)
 	if err != nil {
-		if err == datasource.UUIDParseError {
-			JSONBadRequest(ctx, gin.H{"id": [1]string{err.Error()}})
-		} else {
-			JSONInternalServerError(ctx, err)
-		}
+		JSONInternalServerError(ctx, err)
 		return
 	}
 
@@ -125,10 +128,20 @@ func updateUser(ctx *gin.Context) {
 
 func deleteUser(ctx *gin.Context) {
 	//TODO: Validate user permissions
+	modelID := datasource.UUIDFromString(ctx.Param("user_id"))
+	if modelID == uuid.Nil {
+		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse ID"}})
+		return
+	}
 
-	user, err := datasource.UserWithIDString(ctx, ctx.Param("id"))
+	user, err := datasource.UserWithUUID(ctx, modelID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if user == nil {
+		JSONNotFound(ctx)
 		return
 	}
 

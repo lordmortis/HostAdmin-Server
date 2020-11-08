@@ -72,7 +72,7 @@ func main() {
 	usersGroup.Use(authMiddleware)
 	controllers.Users(usersGroup)
 
-	userGroup := router.Group("/1/user")
+	userGroup := router.Group("/1/user/:user_id")
 	userGroup.Use(authMiddleware)
 	controllers.User(userGroup)
 
