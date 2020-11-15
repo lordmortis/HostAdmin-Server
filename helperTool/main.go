@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/jessevdk/go-flags"
 	_ "github.com/lib/pq"
-	"github.com/lordmortis/IbisStats-Server/config"
+	"github.com/lordmortis/HostAdmin-Server/config"
 	"github.com/pkg/errors"
 	"os"
 	"runtime"

@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	err = datasource.PerformMigrations(conf.Database)
+	err = datasource.PerformMigrations(conf.Database, conf.Development)
 	if err != nil {
 		fmt.Println("Unable to perform/check migrations")
 		fmt.Println(err)
