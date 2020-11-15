@@ -24,13 +24,13 @@ func listUsers(ctx *gin.Context) {
 
 	var models []datasource.User
 
-	models, err := datasource.UsersAll(ctx)
+	models, count, err := datasource.UsersAll(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
-	JSONOk(ctx, models)
+	JSONOkTable(ctx, models, count)
  }
 
 func showUser(ctx *gin.Context) {

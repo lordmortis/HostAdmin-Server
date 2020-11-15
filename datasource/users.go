@@ -50,15 +50,20 @@ func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserS
 	return models, err
 }
 
-func UsersAll(ctx *gin.Context) ([]User, error) {
+func UsersAll(ctx *gin.Context) ([]User, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, -1, err
+	}
+
+	count, err := datamodels_raw.Users().Count(ctx, dbCon)
+	if err != nil {
+		return nil, -1, err
 	}
 
 	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
 	if err != nil {
-		return nil, err
+		return nil, count, err
 	}
 
 	viewModels := make([]User, len(dbModels))
@@ -68,7 +73,7 @@ func UsersAll(ctx *gin.Context) ([]User, error) {
 		viewModels[index] = viewModel
 	}
 
-	return viewModels, nil
+	return viewModels, count, nil
 }
 
 func (user *User) fromDB(dbModel *datamodels_raw.User) {
