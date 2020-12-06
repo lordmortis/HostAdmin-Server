@@ -56,7 +56,7 @@ func showUser(ctx *gin.Context) {
 }
 
 func createUsers(ctx *gin.Context) {
-	//TODO: Validate user permissions
+	//TODO: Validate user permissions - only admins can create
 
 	user := datasource.User{}
 
@@ -71,7 +71,7 @@ func createUsers(ctx *gin.Context) {
 		return
 	}
 
-	_, err := user.Update(ctx)
+	_, err := user.Update(ctx, true)
 	if err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
 		return
@@ -94,25 +94,30 @@ func updateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	if err := user.ParseJSON(ctx); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
 		return
 	}
 
-	modelErrors := user.ValidateUpdate()
+	modelErrors := user.ValidateUpdate(true)
 	if len(modelErrors) > 0 {
 		JSONBadRequest(ctx, modelErrors)
 		return
 	}
 
-	if len(user.NewPassword) > 0 {
-		if !user.ValidatePassword(user.OldPassword) {
+	if user.NewPassword != nil {
+		if !user.ValidatePassword(*user.OldPassword) {
 			JSONBadRequest(ctx, gin.H{"current_password": [1]string{"not set or incorrect"}})
 			return
 		}
 	}
 
-	updated, err := user.Update(ctx)
+	updated, err := user.Update(ctx, true)
+	if err == datasource.ErrUnauthorized {
+		JSONNotAuthorizedResponse(ctx)
+		return
+	}
+
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		_ = ctx.Error(err)

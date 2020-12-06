@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/volatiletech/sqlboiler/boil"
 	"runtime"
 
 	"github.com/lordmortis/HostAdmin-Server/config"
@@ -39,6 +40,10 @@ func main() {
 		fmt.Println("Unable to setup database connection:")
 		fmt.Println(err)
 		return
+	}
+
+	if conf.Development {
+		boil.DebugMode = true
 	}
 
 	var redisMiddleware gin.HandlerFunc

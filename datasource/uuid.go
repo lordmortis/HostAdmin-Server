@@ -29,6 +29,11 @@ func UUIDToBase64(uuidValue uuid.UUID) string {
 	return base64.RawURLEncoding.EncodeToString(uuidValue.Bytes())
 }
 
+func UUIDToBase64Ptr(uuidValue uuid.UUID) *string {
+	value := base64.RawURLEncoding.EncodeToString(uuidValue.Bytes())
+	return &value
+}
+
 func UUIDStringToBase64(uuidString string) string {
 	uuidVal := uuid.FromStringOrNil(uuidString)
 	return base64.RawURLEncoding.EncodeToString(uuidVal.Bytes())
