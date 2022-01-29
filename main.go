@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/volatiletech/sqlboiler/boil"
 	"runtime"
 
 	"github.com/lordmortis/HostAdmin-Server/config"
@@ -35,15 +34,11 @@ func main() {
 	}
 
 	var dbMiddleware gin.HandlerFunc
-	dbMiddleware, err = middleware.Database(conf.Database)
+	dbMiddleware, err = middleware.Database(conf.Database, conf.Development)
 	if err != nil {
 		fmt.Println("Unable to setup database connection:")
 		fmt.Println(err)
 		return
-	}
-
-	if conf.Development {
-		boil.DebugMode = true
 	}
 
 	var redisMiddleware gin.HandlerFunc
@@ -96,8 +91,6 @@ func main() {
 	domainUserGroup := router.Group("/1/domain/:domain_id/user/:user_id")
 	domainUserGroup.Use(authMiddleware)
 	controllers.DomainUser(domainUserGroup)
-
-
 
 	err = router.Run(conf.Server.String())
 	if err != nil {

@@ -14,13 +14,12 @@ import (
 )
 
 type User struct {
-	ID *string `json:"id,omitempty"`
-	Username *string `json:"username"`
-	Email *string `json:"email"`
-	SuperAdmin *bool `json:"super_admin,omitempty"`
-	OldPassword *string `json:"current_password,omitempty"`
-	NewPassword *string `json:"new_password,omitempty"`
-	PasswordConfirmation *string `json:"password_confirmation,omitempty"`
+	ID string `json:"id"`
+	Username string `json:"username"`
+	Email string `json:"email"`
+	OldPassword string `json:"current_password,omitempty"`
+	NewPassword string `json:"new_password,omitempty"`
+	PasswordConfirmation string `json:"password_confirmation,omitempty"`
 	CreatedAt string `json:"created_at,omitempty"`
 	UpdatedAt string `json:"updated_at,omitempty"`
 
@@ -81,10 +80,9 @@ func (user *User) fromDB(dbModel *datamodels_raw.User) {
 	user.uuid = UUIDFromString(dbModel.ID)
 	user.dbModel = dbModel
 
-	user.ID = UUIDToBase64Ptr(user.uuid)
-	user.Username = &dbModel.Username
-	user.Email = &dbModel.Email
-	user.SuperAdmin = &dbModel.SuperAdmin.Bool
+	user.ID = UUIDToBase64(user.uuid)
+	user.Username = dbModel.Username
+	user.Email = dbModel.Email
 
 	if dbModel.CreatedAt.Valid {
 		user.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)
@@ -101,104 +99,63 @@ func (user *User) toDB(dbModel *datamodels_raw.User) {
 		dbModel.ID = id.String()
 	}
 
-	if user.Email != nil {
-		dbModel.Email = *user.Email
+	if len(user.Email) > 0 {
+		dbModel.Email = user.Email
 	}
 
-	if user.SuperAdmin != nil {
-		dbModel.SuperAdmin.Bool = *user.SuperAdmin
+	if len(user.Username) > 0 {
+		dbModel.Username = user.Username
 	}
 
-	if user.Username != nil {
-		dbModel.Username = *user.Username
-	}
-
-	if user.NewPassword != nil {
-		_ = user.SetPassword(*user.NewPassword)
+	if len(user.NewPassword) > 0 && len(user.PasswordConfirmation) > 0 && user.NewPassword == user.PasswordConfirmation {
+		_ = user.SetPassword(user.NewPassword)
 	}
 }
 
-func (user *User)ParseJSON(ctx *gin.Context) error {
-	user.ID = nil
-	user.Username = nil
-	user.Email = nil
-	user.SuperAdmin = nil
-	user.OldPassword = nil
-	user.NewPassword = nil
-	user.PasswordConfirmation = nil
-	if err := ctx.ShouldBindJSON(&user); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (user *User)Update(ctx *gin.Context, admin bool) (bool, error) {
+func (user *User)Update(ctx *gin.Context) (bool, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return false, err
 	}
 
 	insert := false
-	columns := boil.Infer()
 
 	if user.dbModel == nil {
 		insert = true
 		user.dbModel = &datamodels_raw.User{}
 		user.uuid, _ = uuid.NewV4()
-		user.ID = UUIDToBase64Ptr(user.uuid)
+		user.ID = UUIDToBase64(user.uuid)
 		user.dbModel.ID = user.uuid.String()
-		user.dbModel.Username = *user.Username
-		user.dbModel.Email = *user.Email
-		user.dbModel.SuperAdmin.Valid = true
-		if user.SuperAdmin == nil {
-			user.dbModel.SuperAdmin.Bool = false
-		} else {
-			user.dbModel.SuperAdmin.Bool = *user.SuperAdmin
-		}
-
 	} else {
+		modified := false
 
-		columnList := make([]string, 0, 4)
-
-		if user.Email != nil && user.dbModel.Email != *user.Email {
-			columnList = append(columnList, datamodels_raw.UserColumns.Email)
-			user.dbModel.Email = *user.Email
+		if user.dbModel.Email != user.Email {
+			modified = true
+			user.dbModel.Email = user.Email
 		}
 
-		if user.Username != nil && user.dbModel.Username != *user.Username {
-			columnList = append(columnList, datamodels_raw.UserColumns.Username)
-			user.dbModel.Username = *user.Username
+		if user.dbModel.Username != user.Username {
+			modified = true
+			user.dbModel.Username = user.Username
 		}
 
-		if user.NewPassword != nil {
-			if !admin && !user.ValidatePassword(*user.OldPassword) {
-				return false, ErrUnauthorized
-			}
-			columnList = append(columnList, datamodels_raw.UserColumns.EncryptedPassword)
-			user.SetPassword(*user.NewPassword)
+		if len(user.NewPassword) > 0 && len(user.PasswordConfirmation) > 0 && user.NewPassword == user.PasswordConfirmation {
+			modified = true
+			user.SetPassword(user.NewPassword)
 		}
 
-		if admin && user.SuperAdmin != nil {
-			columnList = append(columnList, datamodels_raw.UserColumns.SuperAdmin)
-			user.dbModel.SuperAdmin.Valid = true
-			user.dbModel.SuperAdmin.Bool = *user.SuperAdmin
-		}
-
-		if len(columnList) == 0 {
+		if !modified {
 			return false, nil
 		}
-
-		columns = boil.Whitelist(columnList...)
 	}
 
 	if insert {
-		err := user.dbModel.Insert(ctx, dbCon, columns)
+		err := user.dbModel.Insert(ctx, dbCon, boil.Infer())
 		if err != nil {
 			return false, err
 		}
 	} else {
-		rows, err := user.dbModel.Update(ctx, dbCon, columns)
+		rows, err := user.dbModel.Update(ctx, dbCon, boil.Infer())
 		if err != nil {
 			return false, err
 		}
@@ -219,22 +176,22 @@ func (user *User)Update(ctx *gin.Context, admin bool) (bool, error) {
 func (user *User) ValidateCreate() map[string]interface{} {
 	errorMap := make(map[string]interface{})
 
-	if user.Username == nil {
+	if len(user.Username) == 0 {
 		errorMap["username"] = []string{"must be present"}
-	} else if len(*user.Username) < 4 {
+	} else if len(user.Username) < 4 {
 		errorMap["username"] = []string{"must be at least 4 characters"}
 	}
 
-	if user.Email == nil {
+	if len(user.Email) == 0 {
 		errorMap["email"] = []string{"must be present"}
-	} else if !emailRegexp.MatchString(*user.Email) {
+	} else if !emailRegexp.MatchString(user.Email) {
 		errorMap["email"] = []string{"must be a valid email address"}
 	}
 
-	if user.NewPassword == nil {
+	if len(user.NewPassword) == 0 {
 		errorMap["new_password"] = []string{"required"}
 		errorMap["password_confirmation"] = []string{"required"}
-	} else if *user.NewPassword != *user.PasswordConfirmation {
+	} else if user.NewPassword != user.PasswordConfirmation {
 		errorMap["new_password"] = []string{"must equal password_confirmation"}
 		errorMap["password_confirmation"] = []string{"must equal new_password"}
 	}
@@ -242,26 +199,20 @@ func (user *User) ValidateCreate() map[string]interface{} {
 	return errorMap
 }
 
-func (user *User) ValidateUpdate(admin bool) map[string]interface{} {
+func (user *User) ValidateUpdate() map[string]interface{} {
 	errorMap := make(map[string]interface{})
 
-	if user.Username != nil && len(*user.Username) < 4 {
+	if len(user.Username) != 0 && len(user.Username) < 4 {
 		errorMap["username"] = []string{"must be at least 4 characters"}
 	}
 
-	if user.Email != nil && !emailRegexp.MatchString(*user.Email) {
+	if len(user.Email) > 0 && !emailRegexp.MatchString(user.Email) {
 		errorMap["email"] = []string{"must be a valid email address"}
 	}
 
-	if user.NewPassword != nil {
-		if !admin && user.OldPassword == nil {
-			errorMap["old_password"] = []string{"must pass the old password to update password"}
-		}
-
-		if *user.NewPassword != *user.PasswordConfirmation {
-			errorMap["new_password"] = []string{"must equal password_confirmation"}
-			errorMap["password_confirmation"] = []string{"must equal new_password"}
-		}
+	if len(user.NewPassword) > 0 && user.NewPassword != user.PasswordConfirmation {
+		errorMap["new_password"] = []string{"must equal password_confirmation"}
+		errorMap["password_confirmation"] = []string{"must equal new_password"}
 	}
 
 	return errorMap

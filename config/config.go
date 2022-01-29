@@ -7,30 +7,30 @@ import (
 )
 
 type AuthConfig struct {
-	 SessionExpiry int
+	SessionExpiry int
 }
 
 type DatabaseConfig struct {
 	Hostname string
-	Port int
+	Port     int
 	Database string
 	Username string
 	Password string
 }
 
 type RedisConfig struct {
-	Hostname string
-	Port int
-	Database int
+	Hostname  string
+	Port      int
+	Database  int
 	Namespace string
-	Password string
+	Password  string
 }
 
 type ServerConfig struct {
-	BindAddress string
+	BindAddress    string
 	AllowedOrigins []string
-	Port int
-	SessionExpiry int
+	Port           int
+	SessionExpiry  int
 }
 
 type LoggingConfig struct {
@@ -38,12 +38,12 @@ type LoggingConfig struct {
 }
 
 type Config struct {
-	Auth AuthConfig
+	Auth        AuthConfig
 	Development bool
-	Database DatabaseConfig `json:"db"`
-	Redis RedisConfig
-	Server ServerConfig
-	Logging LoggingConfig
+	Database    DatabaseConfig `json:"db"`
+	Redis       RedisConfig
+	Server      ServerConfig
+	Logging     LoggingConfig
 }
 
 func defaultConfig() Config {
@@ -76,6 +76,8 @@ func Load(filename *string) (*Config, error) {
 
 	if !config.Development {
 		config.Auth.SessionExpiry = 60
+	} else {
+		config.Auth.SessionExpiry = 3600
 	}
 
 	return &config, nil

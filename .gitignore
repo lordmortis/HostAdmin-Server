@@ -5,3 +5,4 @@
 !*.sample.toml
 bin/
 tmp/
+helperTool/helperTool

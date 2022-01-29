@@ -11,13 +11,13 @@ import (
 )
 
 type UserDomain struct {
-	UserID string `json:"userID,omitempty""`
-	User *User `json:"user,omitempty"`
-	DomainID string `json:"domainID,omitempty"`
-	Domain *Domain `json:"domain,omitempty"`
+	UserID   string  `json:"userID,omitempty""`
+	User     *User   `json:"user,omitempty"`
+	DomainID string  `json:"domainID,omitempty"`
+	Domain   *Domain `json:"domain,omitempty"`
 
 	DomainAdmin bool `json:"domainAdmin"`
-	EmailAdmin bool `json:"emailAdmin"`
+	EmailAdmin  bool `json:"emailAdmin"`
 
 	CreatedAt string `json:"created_at,omitempty"`
 	UpdatedAt string `json:"updated_at,omitempty"`
@@ -26,7 +26,7 @@ type UserDomain struct {
 }
 
 //goland:noinspection ALL
-func (parentModel *Domain)Users(ctx *gin.Context, loadUsers bool) ([]UserDomain, int64, error) {
+func (parentModel *Domain) Users(ctx *gin.Context, loadUsers bool) ([]UserDomain, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, -1, err
@@ -64,7 +64,7 @@ func (parentModel *Domain)Users(ctx *gin.Context, loadUsers bool) ([]UserDomain,
 }
 
 //goland:noinspection ALL
-func (parentModel *User)Domains(ctx *gin.Context, loadDomains bool) ([]UserDomain, int64, error) {
+func (parentModel *User) Domains(ctx *gin.Context, loadDomains bool) ([]UserDomain, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, -1, err
@@ -101,7 +101,7 @@ func (parentModel *User)Domains(ctx *gin.Context, loadDomains bool) ([]UserDomai
 	return models, count, nil
 }
 
-func UserDomainsWithIDs(ctx *gin.Context, userID uuid.UUID, domainID uuid.UUID, populateUser bool , populateDomain bool) (*UserDomain, error) {
+func UserDomainsWithIDs(ctx *gin.Context, userID uuid.UUID, domainID uuid.UUID, populateUser bool, populateDomain bool) (*UserDomain, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func UserDomainsWithIDs(ctx *gin.Context, userID uuid.UUID, domainID uuid.UUID, 
 	return &model, nil
 }
 
-func (model *UserDomain)Update(ctx *gin.Context) (bool, error) {
+func (model *UserDomain) Update(ctx *gin.Context) (bool, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -188,15 +188,19 @@ func (model *UserDomain)Update(ctx *gin.Context) (bool, error) {
 	return true, nil
 }
 
-func (model *UserDomain)Delete(ctx *gin.Context) (bool, error) {
+func (model *UserDomain) Delete(ctx *gin.Context) (bool, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return false, err
 	}
 
 	rows, err := model.dbModel.Delete(ctx, dbCon)
-	if err != nil { return false, err }
-	if rows == 0 { return false, nil }
+	if err != nil {
+		return false, err
+	}
+	if rows == 0 {
+		return false, nil
+	}
 
 	return true, nil
 }
@@ -223,12 +227,13 @@ func (model *UserDomain) ValidateUpdate() map[string]interface{} {
 	return errorMap
 }
 
-func (model *UserDomain)fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamodels_raw.UserDomain, populateUser bool , populateDomain bool) {
+func (model *UserDomain) fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamodels_raw.UserDomain, populateUser bool, populateDomain bool) {
 	if populateUser {
 		dbUser, _ := dbModel.User().One(ctx, dbCon)
 		user := User{}
 		user.fromDB(dbUser)
 		model.User = &user
+		model.UserID = user.ID
 	} else {
 		model.UserID = UUIDStringToBase64(dbModel.UserID)
 	}
@@ -238,6 +243,7 @@ func (model *UserDomain)fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamod
 		domain := Domain{}
 		domain.fromDB(dbDomain)
 		model.Domain = &domain
+		model.DomainID = domain.IDBase64
 	} else {
 		model.DomainID = UUIDStringToBase64(dbModel.DomainID)
 	}
@@ -253,8 +259,5 @@ func (model *UserDomain)fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamod
 		model.UpdatedAt = dbModel.UpdatedAt.Time.Format(time.RFC3339)
 	}
 
-
-
 	model.dbModel = dbModel
 }
-

@@ -2,13 +2,18 @@ package middleware
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/volatiletech/sqlboiler/boil"
 
 	"github.com/lordmortis/HostAdmin-Server/config"
 )
 
-func Database(config config.DatabaseConfig) (gin.HandlerFunc, error) {
+func Database(config config.DatabaseConfig, debug bool) (gin.HandlerFunc, error) {
+	if debug {
+		boil.DebugMode = true
+	}
 	var connectionString = "user='" + config.Username + "' "
 	connectionString += "password='" + config.Password + "' "
 	connectionString += "host='" + config.Hostname + "' "

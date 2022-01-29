@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
@@ -9,7 +10,7 @@ import (
 
 func DomainUsers(router gin.IRoutes) {
 	router.GET("", listDomainUsers)
-	router.POST("", createDomainUsers)
+	router.POST("", createDomainUser)
 }
 
 func DomainUser(router gin.IRoutes) {
@@ -34,7 +35,7 @@ func listDomainUsers(ctx *gin.Context) {
 	JSONOkTable(ctx, models, count)
 }
 
-func createDomainUsers(ctx *gin.Context) {
+func createDomainUser(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
 	domain := fetchDomain(ctx)
 	if domain == nil {
@@ -48,12 +49,25 @@ func createDomainUsers(ctx *gin.Context) {
 		return
 	}
 
+	domainID := domain.IDUuid
+	userID := uuid.UUID{}
 	model.Domain = domain
 	if model.UserID != "" {
-		tempID := datasource.UUIDFromString(model.UserID)
-		if tempID != uuid.Nil {
-			model.UserID = tempID.String()
+		userID = datasource.UUIDFromString(model.UserID)
+		if userID != uuid.Nil {
+			model.UserID = userID.String()
 		}
+	}
+
+	existing, err := datasource.UserDomainsWithIDs(ctx, userID, domainID, false, false)
+	if err != nil {
+		fmt.Printf("Internal error: %s", err)
+		JSONInternalServerError(ctx, errors.New("Internal error"))
+	}
+
+	if existing != nil {
+		JSONBadRequest(ctx, gin.H{"general": [1]string{"a record for this user/domain pair exists"}})
+		return
 	}
 
 	modelErrors := model.ValidateUpdate()
@@ -62,7 +76,7 @@ func createDomainUsers(ctx *gin.Context) {
 		return
 	}
 
-	_, err := model.Update(ctx)
+	_, err = model.Update(ctx)
 	if err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
 		return
@@ -74,7 +88,9 @@ func createDomainUsers(ctx *gin.Context) {
 func showDomainUser(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
 	model := fetchDomainUser(ctx)
-	if model == nil { return }
+	if model == nil {
+		return
+	}
 
 	JSONOk(ctx, model)
 }
@@ -82,7 +98,9 @@ func showDomainUser(ctx *gin.Context) {
 func updateDomainUser(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
 	model := fetchDomainUser(ctx)
-	if model == nil { return }
+	if model == nil {
+		return
+	}
 
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{err.Error()}})
@@ -112,7 +130,9 @@ func updateDomainUser(ctx *gin.Context) {
 func deleteDomainUser(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
 	model := fetchDomainUser(ctx)
-	if model == nil { return }
+	if model == nil {
+		return
+	}
 
 	updated, err := model.Delete(ctx)
 	if err != nil {
@@ -127,9 +147,11 @@ func deleteDomainUser(ctx *gin.Context) {
 	}
 }
 
-func fetchDomainUser(ctx *gin.Context) *datasource.UserDomain{
+func fetchDomainUser(ctx *gin.Context) *datasource.UserDomain {
 	domain := fetchDomain(ctx)
-	if domain == nil { return nil }
+	if domain == nil {
+		return nil
+	}
 
 	userID := datasource.UUIDFromString(ctx.Param("user_id"))
 	if userID == uuid.Nil {
