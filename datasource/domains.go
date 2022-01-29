@@ -164,13 +164,8 @@ func (domain *Domain) fromDB(dbModel *datamodels_raw.Domain) {
 	domain.IDUuid = UUIDFromString(dbModel.ID)
 
 	domain.Name = dbModel.Name
-	if dbModel.CreatedAt.Valid {
-		domain.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)
-	}
-
-	if dbModel.UpdatedAt.Valid {
-		domain.UpdatedAt = dbModel.UpdatedAt.Time.Format(time.RFC3339)
-	}
+	domain.CreatedAt = dbModel.CreatedAt.Format(time.RFC3339)
+	domain.UpdatedAt = dbModel.UpdatedAt.Format(time.RFC3339)
 
 	domain.dbModel = dbModel
 }

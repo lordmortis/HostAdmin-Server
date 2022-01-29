@@ -252,14 +252,8 @@ func (model *UserDomain) fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamo
 
 	model.DomainAdmin = dbModel.Admin
 	model.EmailAdmin = dbModel.Email
-
-	if dbModel.CreatedAt.Valid {
-		model.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)
-	}
-
-	if dbModel.UpdatedAt.Valid {
-		model.UpdatedAt = dbModel.UpdatedAt.Time.Format(time.RFC3339)
-	}
+	model.CreatedAt = dbModel.CreatedAt.Format(time.RFC3339)
+	model.UpdatedAt = dbModel.UpdatedAt.Format(time.RFC3339)
 
 	model.dbModel = dbModel
 }

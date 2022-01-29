@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -24,13 +23,13 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID                string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Username          string     `boil:"username" json:"username" toml:"username" yaml:"username"`
-	Email             string     `boil:"email" json:"email" toml:"email" yaml:"email"`
-	EncryptedPassword null.Bytes `boil:"encrypted_password" json:"encrypted_password,omitempty" toml:"encrypted_password" yaml:"encrypted_password,omitempty"`
-	SuperAdmin        null.Bool  `boil:"super_admin" json:"super_admin,omitempty" toml:"super_admin" yaml:"super_admin,omitempty"`
-	CreatedAt         null.Time  `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt         null.Time  `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID                string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Username          string    `boil:"username" json:"username" toml:"username" yaml:"username"`
+	Email             string    `boil:"email" json:"email" toml:"email" yaml:"email"`
+	EncryptedPassword []byte    `boil:"encrypted_password" json:"encrypted_password" toml:"encrypted_password" yaml:"encrypted_password"`
+	SuperAdmin        bool      `boil:"super_admin" json:"super_admin" toml:"super_admin" yaml:"super_admin"`
+	CreatedAt         time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt         time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -74,70 +73,31 @@ var UserTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Bytes struct{ field string }
+type whereHelper__byte struct{ field string }
 
-func (w whereHelpernull_Bytes) EQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Bytes) NEQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Bytes) LT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Bytes) LTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Bytes) GT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Bytes) GTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_Bytes) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Bytes) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
-type whereHelpernull_Bool struct{ field string }
-
-func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Bool) NEQ(x null.Bool) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Bool) LT(x null.Bool) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Bool) LTE(x null.Bool) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Bool) GT(x null.Bool) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelper__byte) EQ(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelper__byte) NEQ(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelper__byte) LT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
 var UserWhere = struct {
 	ID                whereHelperstring
 	Username          whereHelperstring
 	Email             whereHelperstring
-	EncryptedPassword whereHelpernull_Bytes
-	SuperAdmin        whereHelpernull_Bool
-	CreatedAt         whereHelpernull_Time
-	UpdatedAt         whereHelpernull_Time
+	EncryptedPassword whereHelper__byte
+	SuperAdmin        whereHelperbool
+	CreatedAt         whereHelpertime_Time
+	UpdatedAt         whereHelpertime_Time
 }{
 	ID:                whereHelperstring{field: "\"users\".\"id\""},
 	Username:          whereHelperstring{field: "\"users\".\"username\""},
 	Email:             whereHelperstring{field: "\"users\".\"email\""},
-	EncryptedPassword: whereHelpernull_Bytes{field: "\"users\".\"encrypted_password\""},
-	SuperAdmin:        whereHelpernull_Bool{field: "\"users\".\"super_admin\""},
-	CreatedAt:         whereHelpernull_Time{field: "\"users\".\"created_at\""},
-	UpdatedAt:         whereHelpernull_Time{field: "\"users\".\"updated_at\""},
+	EncryptedPassword: whereHelper__byte{field: "\"users\".\"encrypted_password\""},
+	SuperAdmin:        whereHelperbool{field: "\"users\".\"super_admin\""},
+	CreatedAt:         whereHelpertime_Time{field: "\"users\".\"created_at\""},
+	UpdatedAt:         whereHelpertime_Time{field: "\"users\".\"updated_at\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -162,8 +122,8 @@ type userL struct{}
 
 var (
 	userAllColumns            = []string{"id", "username", "email", "encrypted_password", "super_admin", "created_at", "updated_at"}
-	userColumnsWithoutDefault = []string{"id", "username", "email"}
-	userColumnsWithDefault    = []string{"encrypted_password", "super_admin", "created_at", "updated_at"}
+	userColumnsWithoutDefault = []string{"id", "username", "email", "encrypted_password", "super_admin", "created_at", "updated_at"}
+	userColumnsWithDefault    = []string{}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
@@ -665,11 +625,11 @@ func (o *User) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		if queries.MustTime(o.UpdatedAt).IsZero() {
-			queries.SetScanner(&o.UpdatedAt, currTime)
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
 		}
 	}
 
@@ -750,7 +710,7 @@ func (o *User) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	var err error
@@ -886,10 +846,10 @@ func (o *User) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

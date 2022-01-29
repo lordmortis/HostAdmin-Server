@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -28,8 +27,8 @@ type UserDomain struct {
 	DomainID  string    `boil:"domain_id" json:"domain_id" toml:"domain_id" yaml:"domain_id"`
 	Admin     bool      `boil:"admin" json:"admin" toml:"admin" yaml:"admin"`
 	Email     bool      `boil:"email" json:"email" toml:"email" yaml:"email"`
-	CreatedAt null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userDomainR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userDomainL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -74,15 +73,15 @@ var UserDomainWhere = struct {
 	DomainID  whereHelperstring
 	Admin     whereHelperbool
 	Email     whereHelperbool
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	UserID:    whereHelperstring{field: "\"user_domain\".\"user_id\""},
 	DomainID:  whereHelperstring{field: "\"user_domain\".\"domain_id\""},
 	Admin:     whereHelperbool{field: "\"user_domain\".\"admin\""},
 	Email:     whereHelperbool{field: "\"user_domain\".\"email\""},
-	CreatedAt: whereHelpernull_Time{field: "\"user_domain\".\"created_at\""},
-	UpdatedAt: whereHelpernull_Time{field: "\"user_domain\".\"updated_at\""},
+	CreatedAt: whereHelpertime_Time{field: "\"user_domain\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"user_domain\".\"updated_at\""},
 }
 
 // UserDomainRels is where relationship names are stored.
@@ -110,8 +109,8 @@ type userDomainL struct{}
 
 var (
 	userDomainAllColumns            = []string{"user_id", "domain_id", "admin", "email", "created_at", "updated_at"}
-	userDomainColumnsWithoutDefault = []string{"user_id", "domain_id"}
-	userDomainColumnsWithDefault    = []string{"admin", "email", "created_at", "updated_at"}
+	userDomainColumnsWithoutDefault = []string{"user_id", "domain_id", "created_at", "updated_at"}
+	userDomainColumnsWithDefault    = []string{"admin", "email"}
 	userDomainPrimaryKeyColumns     = []string{"user_id", "domain_id"}
 	userDomainGeneratedColumns      = []string{}
 )
@@ -771,11 +770,11 @@ func (o *UserDomain) Insert(ctx context.Context, exec boil.ContextExecutor, colu
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		if queries.MustTime(o.UpdatedAt).IsZero() {
-			queries.SetScanner(&o.UpdatedAt, currTime)
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
 		}
 	}
 
@@ -856,7 +855,7 @@ func (o *UserDomain) Update(ctx context.Context, exec boil.ContextExecutor, colu
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	var err error
@@ -992,10 +991,10 @@ func (o *UserDomain) Upsert(ctx context.Context, exec boil.ContextExecutor, upda
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

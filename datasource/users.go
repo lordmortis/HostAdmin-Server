@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
@@ -18,6 +17,7 @@ type User struct {
 	ID                   string `json:"id"`
 	Username             string `json:"username"`
 	Email                string `json:"email"`
+	SuperAdmin           bool   `json:"superAdmin"`
 	OldPassword          string `json:"current_password,omitempty"`
 	NewPassword          string `json:"new_password,omitempty"`
 	PasswordConfirmation string `json:"password_confirmation,omitempty"`
@@ -85,13 +85,8 @@ func (user *User) fromDB(dbModel *datamodels_raw.User) {
 	user.Username = dbModel.Username
 	user.Email = dbModel.Email
 
-	if dbModel.CreatedAt.Valid {
-		user.CreatedAt = dbModel.CreatedAt.Time.Format(time.RFC3339)
-	}
-
-	if dbModel.UpdatedAt.Valid {
-		user.UpdatedAt = dbModel.UpdatedAt.Time.Format(time.RFC3339)
-	}
+	user.CreatedAt = dbModel.CreatedAt.Format(time.RFC3339)
+	user.UpdatedAt = dbModel.UpdatedAt.Format(time.RFC3339)
 }
 
 func (user *User) toDB(dbModel *datamodels_raw.User) {
@@ -123,10 +118,15 @@ func (user *User) Update(ctx *gin.Context) (bool, error) {
 
 	if user.dbModel == nil {
 		insert = true
-		user.dbModel = &datamodels_raw.User{}
+		dbModel := datamodels_raw.User{}
+		user.dbModel = &dbModel
 		user.uuid, _ = uuid.NewV4()
 		user.ID = UUIDToBase64(user.uuid)
 		user.dbModel.ID = user.uuid.String()
+		user.SetPassword(user.NewPassword)
+		dbModel.Username = user.Username
+		dbModel.Email = user.Email
+		dbModel.SuperAdmin = user.SuperAdmin
 	} else {
 		modified := false
 
@@ -140,9 +140,14 @@ func (user *User) Update(ctx *gin.Context) (bool, error) {
 			user.dbModel.Username = user.Username
 		}
 
-		if len(user.NewPassword) > 0 && len(user.PasswordConfirmation) > 0 && user.NewPassword == user.PasswordConfirmation {
+		if len(user.NewPassword) > 0 {
 			modified = true
 			user.SetPassword(user.NewPassword)
+		}
+
+		if user.dbModel.SuperAdmin != user.SuperAdmin {
+			modified = true
+			user.dbModel.SuperAdmin = user.SuperAdmin
 		}
 
 		if !modified {
@@ -225,12 +230,12 @@ func (user *User) SetPassword(newPassword string) error {
 		return err
 	}
 
-	user.dbModel.EncryptedPassword = null.BytesFrom(hashedPassword)
+	user.dbModel.EncryptedPassword = hashedPassword
 	return nil
 }
 
 func (user *User) ValidatePassword(password string) bool {
-	if err := bcrypt.CompareHashAndPassword(user.dbModel.EncryptedPassword.Bytes, []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword(user.dbModel.EncryptedPassword, []byte(password)); err != nil {
 		return false
 	}
 	return true

@@ -41,7 +41,7 @@ func authLogin(ctx *gin.Context) {
 		hashedPass = []byte("$2a$10$xJF47sKayeXieBkh7i98ce2/Ok13IPcSWqW9eozJAM.TTsPgVNQbK")
 		useRealBcrypt = false
 	} else {
-		hashedPass = dbModels[0].EncryptedPassword.Bytes
+		hashedPass = dbModels[0].EncryptedPassword
 	}
 
 	if err := bcrypt.CompareHashAndPassword(hashedPass, []byte(loginData.Password)); err != nil {
@@ -63,7 +63,7 @@ func authLogin(ctx *gin.Context) {
 
 	JSONOk(ctx, gin.H{
 		"sessionID": session.Base64ID,
-		"expiry": session.Expiry.Format(time.RFC3339),
+		"expiry":    session.Expiry.Format(time.RFC3339),
 	})
 }
 
@@ -83,6 +83,6 @@ func authKeepAlive(ctx *gin.Context) {
 
 	JSONOk(ctx, gin.H{
 		"sessionID": sessionID,
-		"expiry": expiryTime.Format(time.RFC3339),
+		"expiry":    expiryTime.Format(time.RFC3339),
 	})
 }
