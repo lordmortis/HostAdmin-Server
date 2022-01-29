@@ -2,28 +2,29 @@ package datasource
 
 import (
 	"database/sql"
+	"regexp"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
-	"github.com/volatiletech/null"
-	"github.com/volatiletech/sqlboiler/boil"
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
-	"regexp"
-	"time"
 )
 
 type User struct {
-	ID string `json:"id"`
-	Username string `json:"username"`
-	Email string `json:"email"`
-	OldPassword string `json:"current_password,omitempty"`
-	NewPassword string `json:"new_password,omitempty"`
+	ID                   string `json:"id"`
+	Username             string `json:"username"`
+	Email                string `json:"email"`
+	OldPassword          string `json:"current_password,omitempty"`
+	NewPassword          string `json:"new_password,omitempty"`
 	PasswordConfirmation string `json:"password_confirmation,omitempty"`
-	CreatedAt string `json:"created_at,omitempty"`
-	UpdatedAt string `json:"updated_at,omitempty"`
+	CreatedAt            string `json:"created_at,omitempty"`
+	UpdatedAt            string `json:"updated_at,omitempty"`
 
-	uuid uuid.UUID
+	uuid    uuid.UUID
 	dbModel *datamodels_raw.User
 }
 
@@ -35,7 +36,7 @@ func init() {
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 }
 
-func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserSlice, error){
+func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserSlice, error) {
 	dbCon, err := dbFromContext(ctx)
 
 	if err != nil {
@@ -112,7 +113,7 @@ func (user *User) toDB(dbModel *datamodels_raw.User) {
 	}
 }
 
-func (user *User)Update(ctx *gin.Context) (bool, error) {
+func (user *User) Update(ctx *gin.Context) (bool, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -218,7 +219,7 @@ func (user *User) ValidateUpdate() map[string]interface{} {
 	return errorMap
 }
 
-func (user *User)SetPassword(newPassword string) error {
+func (user *User) SetPassword(newPassword string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -228,14 +229,14 @@ func (user *User)SetPassword(newPassword string) error {
 	return nil
 }
 
-func (user *User)ValidatePassword(password string) bool {
+func (user *User) ValidatePassword(password string) bool {
 	if err := bcrypt.CompareHashAndPassword(user.dbModel.EncryptedPassword.Bytes, []byte(password)); err != nil {
 		return false
 	}
 	return true
 }
 
-func (user *User)Delete(ctx *gin.Context) (bool, error) {
+func (user *User) Delete(ctx *gin.Context) (bool, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -263,7 +264,7 @@ func UserWithUUID(ctx *gin.Context, id uuid.UUID) (*User, error) {
 		return nil, UUIDParseError
 	}
 
-	dbModel, err := datamodels_raw.FindUser(ctx,dbCon, id.String())
+	dbModel, err := datamodels_raw.FindUser(ctx, dbCon, id.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

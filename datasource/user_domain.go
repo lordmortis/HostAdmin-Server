@@ -2,12 +2,14 @@ package datasource
 
 import (
 	"database/sql"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+
 	"github.com/lordmortis/HostAdmin-Server/datamodels_raw"
-	"github.com/volatiletech/sqlboiler/boil"
-	"github.com/volatiletech/sqlboiler/queries/qm"
-	"time"
 )
 
 type UserDomain struct {
@@ -26,16 +28,16 @@ type UserDomain struct {
 }
 
 //goland:noinspection ALL
-func (parentModel *Domain) Users(ctx *gin.Context, loadUsers bool) ([]UserDomain, int64, error) {
+func (domain *Domain) Users(ctx *gin.Context, loadUsers bool) ([]UserDomain, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	countQuery := parentModel.dbModel.UserDomains()
-	dataQuery := parentModel.dbModel.UserDomains()
+	countQuery := domain.dbModel.UserDomains()
+	dataQuery := domain.dbModel.UserDomains()
 	if loadUsers {
-		dataQuery = parentModel.dbModel.UserDomains(qm.Load("User"))
+		dataQuery = domain.dbModel.UserDomains(qm.Load("User"))
 	}
 
 	count, err := countQuery.Count(ctx, dbCon)
