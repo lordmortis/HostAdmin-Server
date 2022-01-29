@@ -113,7 +113,7 @@ func deleteDomain(ctx *gin.Context) {
 func fetchDomain(ctx *gin.Context) *datasource.Domain {
 	domainID := datasource.UUIDFromString(ctx.Param("domain_id"))
 	if domainID == uuid.Nil {
-		JSONBadRequest(ctx, gin.H{"id": [1]string{"Unable to parse domain ID"}})
+		JSONBadRequest(ctx, gin.H{"domain_id": [1]string{"Unable to parse domain ID"}})
 		return nil
 	}
 
@@ -124,7 +124,7 @@ func fetchDomain(ctx *gin.Context) *datasource.Domain {
 	}
 
 	if domain == nil {
-		JSONNotFound(ctx)
+		JSONBadRequest(ctx, gin.H{"domain_id": [1]string{"Unable to find domain ID"}})
 		return nil
 	}
 
