@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 )
 
 type CreateMigrationCommand struct {
-	Name string `long:"name" description:"Migration name"`
 	Directory string `long:"directory" description:"source code root directory" default:"../"`
 }
 
@@ -28,11 +28,11 @@ func init() {
 	}
 }
 
-func (x *CreateMigrationCommand)Execute(args[]string) error {
+func (x *CreateMigrationCommand) Execute(args []string) error {
 	errString := ""
 	migrationDirectory := ""
 
-	if len(x.Name) == 0 {
+	if len(args) == 0 {
 		errString += "Need a name for the migration\n"
 	}
 
@@ -51,17 +51,18 @@ func (x *CreateMigrationCommand)Execute(args[]string) error {
 	if len(errString) > 0 {
 		return errors.New(errString)
 	}
+	migrationName := strings.Join(args, " ")
 
 	var spaceRegex = regexp.MustCompile("\\s+")
 	var nonWordRegex = regexp.MustCompile("\\W")
 
 	timestamp := time.Now().UTC()
-	name := spaceRegex.ReplaceAllString(x.Name, "_")
-	name = nonWordRegex.ReplaceAllString(name, "-")
-	name = fmt.Sprintf("%d_%s", timestamp.Unix(), name)
+	migrationName = spaceRegex.ReplaceAllString(migrationName, "_")
+	migrationName = nonWordRegex.ReplaceAllString(migrationName, "-")
+	migrationName = fmt.Sprintf("%d_%s", timestamp.Unix(), migrationName)
 
-	up := filepath.Join(migrationDirectory, fmt.Sprintf("%s.up.sql", name))
-	down := filepath.Join(migrationDirectory, fmt.Sprintf("%s.down.sql", name))
+	up := filepath.Join(migrationDirectory, fmt.Sprintf("%s.up.sql", migrationName))
+	down := filepath.Join(migrationDirectory, fmt.Sprintf("%s.down.sql", migrationName))
 
 	fmt.Printf("Will create:\n\t%s\n\t%s\nProceed? ", up, down)
 
