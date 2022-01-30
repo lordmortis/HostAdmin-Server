@@ -18,9 +18,9 @@ type User struct {
 	Username             string `json:"username"`
 	Email                string `json:"email"`
 	SuperAdmin           bool   `json:"superAdmin"`
-	OldPassword          string `json:"current_password,omitempty"`
-	NewPassword          string `json:"new_password,omitempty"`
-	PasswordConfirmation string `json:"password_confirmation,omitempty"`
+	OldPassword          string `json:"currentPassword,omitempty"`
+	NewPassword          string `json:"newPassword,omitempty"`
+	PasswordConfirmation string `json:"passwordConfirmation,omitempty"`
 	CreatedAt            string `json:"created_at,omitempty"`
 	UpdatedAt            string `json:"updated_at,omitempty"`
 
@@ -195,11 +195,11 @@ func (user *User) ValidateCreate() map[string]interface{} {
 	}
 
 	if len(user.NewPassword) == 0 {
-		errorMap["new_password"] = []string{"required"}
-		errorMap["password_confirmation"] = []string{"required"}
+		errorMap["newPassword"] = []string{"required"}
+		errorMap["passwordConfirmation"] = []string{"required"}
 	} else if user.NewPassword != user.PasswordConfirmation {
-		errorMap["new_password"] = []string{"must equal password_confirmation"}
-		errorMap["password_confirmation"] = []string{"must equal new_password"}
+		errorMap["newPassword"] = []string{"must equal password_confirmation"}
+		errorMap["passwordConfirmation"] = []string{"must equal new_password"}
 	}
 
 	return errorMap
@@ -217,8 +217,8 @@ func (user *User) ValidateUpdate() map[string]interface{} {
 	}
 
 	if len(user.NewPassword) > 0 && user.NewPassword != user.PasswordConfirmation {
-		errorMap["new_password"] = []string{"must equal password_confirmation"}
-		errorMap["password_confirmation"] = []string{"must equal new_password"}
+		errorMap["newPassword"] = []string{"must equal password_confirmation"}
+		errorMap["passwordConfirmation"] = []string{"must equal new_password"}
 	}
 
 	return errorMap
