@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
@@ -20,7 +21,13 @@ func Domain(router gin.IRoutes) {
 
 func listDomains(ctx *gin.Context) {
 	//TODO: Validate user permissions
-	models, count, err := datasource.DomainsAll(ctx)
+
+	limit, offset, err := getPaginationParams(ctx)
+	if err != nil {
+		fmt.Printf("Unable to get pagination: %s\n", err)
+	}
+
+	models, count, err := datasource.DomainsAll(ctx, limit, offset)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return

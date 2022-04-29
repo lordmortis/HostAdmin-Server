@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"database/sql"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -31,18 +32,25 @@ func init() {
 	//	nameRegexp = regexp.MustCompile("^(((?!-))(xn--|_{1,1})?[a-z0-9-]{0,61}[a-z0-9]{1,1}.)*(xn--)?([a-z0-9-]{1,61}|[a-z0-9-]{1,30}.[a-z]{2,})$")
 }
 
-func DomainsAll(ctx *gin.Context) ([]Domain, int64, error) {
+func DomainsAll(ctx *gin.Context, limit int, offset int) ([]Domain, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	count, err := datamodels_raw.Domains().Count(ctx, dbCon)
+	var query []qm.QueryMod
+
+	count, err := datamodels_raw.Domains(query...).Count(ctx, dbCon)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	dbModels, err := datamodels_raw.Domains().All(ctx, dbCon)
+	if limit > 0 && offset >= 0 {
+		query = append(query, qm.Limit(limit))
+		query = append(query, qm.Offset(offset))
+	}
+
+	dbModels, err := datamodels_raw.Domains(query...).All(ctx, dbCon)
 	if err != nil {
 		return nil, -1, err
 	}

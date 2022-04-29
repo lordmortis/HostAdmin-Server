@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
@@ -21,17 +22,21 @@ func User(router gin.IRoutes) {
 
 func listUsers(ctx *gin.Context) {
 	//TODO: Validate user permissions
-
 	var models []datasource.User
 
-	models, count, err := datasource.UsersAll(ctx)
+	limit, offset, err := getPaginationParams(ctx)
+	if err != nil {
+		fmt.Printf("Unable to get pagination: %s\n", err)
+	}
+
+	models, count, err := datasource.UsersAll(ctx, limit, offset)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
 	}
 
 	JSONOkTable(ctx, models, count)
- }
+}
 
 func showUser(ctx *gin.Context) {
 	//TODO: Validate user permissions

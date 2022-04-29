@@ -51,18 +51,25 @@ func UsersWithUsername(ctx *gin.Context, username *string) (datamodels_raw.UserS
 	return models, err
 }
 
-func UsersAll(ctx *gin.Context) ([]User, int64, error) {
+func UsersAll(ctx *gin.Context, limit int, offset int) ([]User, int64, error) {
 	dbCon, err := dbFromContext(ctx)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	count, err := datamodels_raw.Users().Count(ctx, dbCon)
+	var query []qm.QueryMod
+
+	count, err := datamodels_raw.Users(query...).Count(ctx, dbCon)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	dbModels, err := datamodels_raw.Users().All(ctx, dbCon)
+	if limit > 0 && offset >= 0 {
+		query = append(query, qm.Limit(limit))
+		query = append(query, qm.Offset(offset))
+	}
+
+	dbModels, err := datamodels_raw.Users(query...).All(ctx, dbCon)
 	if err != nil {
 		return nil, count, err
 	}
