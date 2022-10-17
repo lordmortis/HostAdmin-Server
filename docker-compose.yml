@@ -1,13 +1,13 @@
 version: '3.7'
 services:
-  postgres10:
+  postgres:
     image: postgres:14-alpine
     networks:
       - front
     ports:
       - 15432:5432
     volumes:
-      - postgres10Data:/var/lib/postgresql/data
+      - postgresData:/var/lib/postgresql/data
     restart: "no"
     environment:
       POSTGRES_PASSWORD: rootpassword
@@ -19,7 +19,7 @@ services:
       - 16379:6379
 
 volumes:
-  postgres10Data:
+  postgresData:
 
 networks:
   front:
