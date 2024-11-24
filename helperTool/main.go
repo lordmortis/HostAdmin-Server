@@ -20,7 +20,6 @@ type Options struct {
 var options Options
 var parser = flags.NewParser(&options, flags.Default)
 var configFile *config.Config
-var dbCon *sql.DB
 
 func dbConnect(username string, password string, database string) (*sql.DB, error) {
 	connectionString := fmt.Sprintf(
@@ -44,17 +43,6 @@ func main() {
 		configFile, err = config.Load(&options.ConfigFile)
 		if err != nil {
 			return errors.Wrap(err, "Unable to parse config file")
-		}
-
-		dbCon, err = dbConnect(options.DBRootUser, options.DBRootPw, "postgres")
-		if err != nil {
-			return errors.Wrap(err, "Unable to connect to database")
-		}
-
-		_, err = dbCon.Exec("SELECT true")
-
-		if err != nil {
-			return errors.Wrap(err, "Unable to connect to database")
 		}
 
 		return command.Execute(args)
