@@ -52,6 +52,10 @@ func main() {
 	authMiddleware := middleware.Auth()
 	middleware.AuthSetConfig(conf.Auth)
 
+	if !conf.Development {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = conf.Server.AllowedOrigins
