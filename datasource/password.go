@@ -2,6 +2,8 @@ package datasource
 
 import (
 	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -18,8 +20,9 @@ var argonParams params
 
 func init() {
 	argonParams = params{
-		memory:      64 * 1024,
-		iterations:  3,
+		//		memory:      64 * 1024,
+		memory:      1024,
+		iterations:  2,
 		parallelism: 2,
 		saltLength:  16,
 		keyLength:   32,
@@ -27,14 +30,18 @@ func init() {
 }
 
 func argonHash(password string) (hash []byte, err error) {
+	hashString := fmt.Sprintf("{ARGON2ID}$argon2id$v=%d", argon2.Version)
+	hashString += fmt.Sprintf("$m=%d,t=%d,p=%d", argonParams.memory, argonParams.iterations, argonParams.parallelism)
 	salt, err := generateRandomBytes(argonParams.saltLength)
 	if err != nil {
 		return nil, err
 	}
+	hashString += fmt.Sprintf("$%s", base64.RawStdEncoding.EncodeToString(salt))
 
-	hash = argon2.IDKey([]byte(password), salt, argonParams.iterations, argonParams.memory, argonParams.parallelism, argonParams.keyLength)
+	rawHash := argon2.IDKey([]byte(password), salt, argonParams.iterations, argonParams.memory, argonParams.parallelism, argonParams.keyLength)
+	hashString += fmt.Sprintf("$%s", base64.RawStdEncoding.EncodeToString(rawHash))
 
-	return hash, nil
+	return []byte(hashString), nil
 }
 
 func generateRandomBytes(n uint32) ([]byte, error) {

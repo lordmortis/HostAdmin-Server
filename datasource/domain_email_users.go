@@ -215,7 +215,7 @@ func (model *DomainEmailUser) ValidateUpdate() map[string]interface{} {
 		}
 
 		if len(passwordConfirmErrors) > 0 {
-			errorMap["passwordConfirm"] = passwordConfirmErrors
+			errorMap["passwordConfirmation"] = passwordConfirmErrors
 		}
 	}
 
