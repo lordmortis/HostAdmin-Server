@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"runtime"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -19,11 +20,15 @@ type params struct {
 var argonParams params
 
 func init() {
+	numCpus := runtime.NumCPU()
+	if numCpus >= 256 {
+		numCpus = 255
+	}
+
 	argonParams = params{
-		//		memory:      64 * 1024,
-		memory:      1024,
+		memory:      64 * 1024,
 		iterations:  2,
-		parallelism: 2,
+		parallelism: uint8(numCpus),
 		saltLength:  16,
 		keyLength:   32,
 	}
