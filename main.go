@@ -3,15 +3,53 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/lordmortis/HostAdmin-Server/templateData"
+	"html/template"
+	"os"
+	"runtime"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"runtime"
 
 	"github.com/lordmortis/HostAdmin-Server/config"
 	"github.com/lordmortis/HostAdmin-Server/controllers"
 	"github.com/lordmortis/HostAdmin-Server/datasource"
 	"github.com/lordmortis/HostAdmin-Server/middleware"
 )
+
+func setupTemplates(router *gin.Engine, development bool) {
+	if development {
+		router.LoadHTMLGlob("templates/*")
+		return
+	}
+
+	t := template.New("")
+
+	for _, name := range templateData.AssetNames() {
+		file, err := templateData.AssetInfo(name)
+		if err != nil {
+			_, _ = os.Stderr.WriteString(fmt.Sprintf("Unable to get info on template file '%s' - %s\n", name, err))
+			continue
+		}
+
+		if file.IsDir() {
+			continue
+		}
+
+		data, err := templateData.AssetString(name)
+		if err != nil {
+			_, _ = os.Stderr.WriteString(fmt.Sprintf("Unable to read template file '%s' - %s\n", name, err))
+			continue
+		}
+		t, err = t.New(name).Parse(data)
+		if err != nil {
+			_, _ = os.Stderr.WriteString(fmt.Sprintf("Unable to parse template file '%s' into template - %s\n", name, err))
+			continue
+		}
+	}
+
+	router.SetHTMLTemplate(t)
+}
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -64,6 +102,7 @@ func main() {
 	router.Use(cors.New(corsConfig))
 	router.Use(dbMiddleware)
 	router.Use(redisMiddleware)
+	setupTemplates(router, conf.Development)
 
 	loginGroup := router.Group("/1/login")
 	controllers.Login(loginGroup)
@@ -103,6 +142,17 @@ func main() {
 	domainEmailUserGroup := router.Group("/1/domain/:domain_id/emailUser/:base_address")
 	domainEmailUserGroup.Use(authMiddleware)
 	controllers.DomainEmailUser(domainEmailUserGroup)
+
+	domainEmailSelfAdminGroup := router.Group("/1/domain/:domain_id/emailUser/:base_address")
+	controllers.DomainEmailUserSelfAdmin(domainEmailSelfAdminGroup)
+
+	domainEmailAliasesGroup := router.Group("/1/domain/:domain_id/emailAliases")
+	domainEmailAliasesGroup.Use(authMiddleware)
+	controllers.DomainEmailAliases(domainEmailAliasesGroup)
+
+	domainEmailAliasGroup := router.Group("/1/domain/:domain_id/emailAlias/:address")
+	domainEmailAliasGroup.Use(authMiddleware)
+	controllers.DomainEmailAlias(domainEmailAliasGroup)
 
 	err = router.Run(conf.Server.String())
 	if err != nil {

@@ -1,0 +1,82 @@
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>HasRemovalPasscode</key>
+        <false/>
+        <key>PayloadContent</key>
+        <array>
+            <dict>
+                <key>EmailAccountDescription</key>
+                <string>{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+                <key>EmailAccountType</key>
+                <string>EmailTypeIMAP</string>
+                <key>EmailAddress</key>
+                <string>{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+                <key>IncomingMailServerAuthentication</key>
+                <string>EmailAuthPassword</string>
+                <key>IncomingMailServerHostName</key>
+                <string>newmail.sektorseven.net</string>
+                <key>IncomingMailServerPortNumber</key>
+                <integer>993</integer>
+                <key>IncomingMailServerUseSSL</key>
+                <true/>
+                <key>IncomingMailServerUsername</key>
+                <string>{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+                <key>IncomingPassword</key>
+                <string>{{ .password }}</string>
+                <key>OutgoingMailServerAuthentication</key>
+                <string>EmailAuthPassword</string>
+                <key>OutgoingMailServerHostName</key>
+                <string>newmail.sektorseven.net</string>
+                <key>OutgoingMailServerPortNumber</key>
+                <integer>587</integer>
+                <key>OutgoingMailServerUseSSL</key>
+                <true/>
+                <key>OutgoingMailServerUsername</key>
+                <string>{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+                <key>OutgoingPasswordSameAsIncomingPassword</key>
+                <true/>
+                <key>PayloadDescription</key>
+                <string>Configures Email settings</string>
+                <key>PayloadDisplayName</key>
+                <string>{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+                <key>PayloadIdentifier</key>
+                <string>com.apple.mail.managed.79E8C1D2-F8E9-4206-BA4E-31651764E4E2</string>
+                <key>PayloadType</key>
+                <string>com.apple.mail.managed</string>
+                <key>PayloadUUID</key>
+                <string>79E8C1D2-F8E9-4206-BA4E-31651764E4E2</string>
+                <key>PayloadVersion</key>
+                <integer>1</integer>
+                <key>SMIMEEnablePerMessageSwitch</key>
+                <false/>
+                <key>SMIMEEnabled</key>
+                <false/>
+                <key>SMIMEEncryptionEnabled</key>
+                <false/>
+                <key>SMIMESigningEnabled</key>
+                <false/>
+                <key>allowMailDrop</key>
+                <false/>
+                <key>disableMailRecentsSyncing</key>
+                <false/>
+            </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>Email Profile for {{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+        <key>PayloadDisplayName</key>
+        <string>{{ .user.BaseAddress }}@{{ .domain.Name }} - S7 E-Mail</string>
+        <key>PayloadIdentifier</key>
+        <string>s7-email-{{ .user.BaseAddress }}@{{ .domain.Name }}</string>
+        <key>PayloadOrganization</key>
+        <string>SektorSeven</string>
+        <key>PayloadRemovalDisallowed</key>
+        <false/>
+        <key>PayloadType</key>
+        <string>Configuration</string>
+        <key>PayloadUUID</key>
+        <string>A921E24B-1304-49BD-8F82-BAB55013EB5C</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+    </dict>
+</plist>

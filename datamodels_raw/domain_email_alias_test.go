@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testDomainEmailUsers(t *testing.T) {
+func testDomainEmailAliases(t *testing.T) {
 	t.Parallel()
 
-	query := DomainEmailUsers()
+	query := DomainEmailAliases()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testDomainEmailUsersDelete(t *testing.T) {
+func testDomainEmailAliasesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testDomainEmailUsersDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testDomainEmailUsersDelete(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersQueryDeleteAll(t *testing.T) {
+func testDomainEmailAliasesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testDomainEmailUsersQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := DomainEmailUsers().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := DomainEmailAliases().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testDomainEmailUsersQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersSliceDeleteAll(t *testing.T) {
+func testDomainEmailAliasesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testDomainEmailUsersSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := DomainEmailUserSlice{o}
+	slice := DomainEmailAliasSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testDomainEmailUsersSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testDomainEmailUsersSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersExists(t *testing.T) {
+func testDomainEmailAliasesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testDomainEmailUsersExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := DomainEmailUserExists(ctx, tx, o.DomainID, o.BaseAddress)
+	e, err := DomainEmailAliasExists(ctx, tx, o.DomainID, o.Address)
 	if err != nil {
-		t.Errorf("Unable to check if DomainEmailUser exists: %s", err)
+		t.Errorf("Unable to check if DomainEmailAlias exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected DomainEmailUserExists to return true, but got false.")
+		t.Errorf("Expected DomainEmailAliasExists to return true, but got false.")
 	}
 }
 
-func testDomainEmailUsersFind(t *testing.T) {
+func testDomainEmailAliasesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testDomainEmailUsersFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	domainEmailUserFound, err := FindDomainEmailUser(ctx, tx, o.DomainID, o.BaseAddress)
+	domainEmailAliasFound, err := FindDomainEmailAlias(ctx, tx, o.DomainID, o.Address)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if domainEmailUserFound == nil {
+	if domainEmailAliasFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testDomainEmailUsersBind(t *testing.T) {
+func testDomainEmailAliasesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testDomainEmailUsersBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = DomainEmailUsers().Bind(ctx, tx, o); err != nil {
+	if err = DomainEmailAliases().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testDomainEmailUsersOne(t *testing.T) {
+func testDomainEmailAliasesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testDomainEmailUsersOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := DomainEmailUsers().One(ctx, tx); err != nil {
+	if x, err := DomainEmailAliases().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testDomainEmailUsersAll(t *testing.T) {
+func testDomainEmailAliasesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	domainEmailUserOne := &DomainEmailUser{}
-	domainEmailUserTwo := &DomainEmailUser{}
-	if err = randomize.Struct(seed, domainEmailUserOne, domainEmailUserDBTypes, false, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	domainEmailAliasOne := &DomainEmailAlias{}
+	domainEmailAliasTwo := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, domainEmailAliasOne, domainEmailAliasDBTypes, false, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
-	if err = randomize.Struct(seed, domainEmailUserTwo, domainEmailUserDBTypes, false, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err = randomize.Struct(seed, domainEmailAliasTwo, domainEmailAliasDBTypes, false, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = domainEmailUserOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = domainEmailAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = domainEmailUserTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = domainEmailAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := DomainEmailUsers().All(ctx, tx)
+	slice, err := DomainEmailAliases().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testDomainEmailUsersAll(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersCount(t *testing.T) {
+func testDomainEmailAliasesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	domainEmailUserOne := &DomainEmailUser{}
-	domainEmailUserTwo := &DomainEmailUser{}
-	if err = randomize.Struct(seed, domainEmailUserOne, domainEmailUserDBTypes, false, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	domainEmailAliasOne := &DomainEmailAlias{}
+	domainEmailAliasTwo := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, domainEmailAliasOne, domainEmailAliasDBTypes, false, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
-	if err = randomize.Struct(seed, domainEmailUserTwo, domainEmailUserDBTypes, false, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err = randomize.Struct(seed, domainEmailAliasTwo, domainEmailAliasDBTypes, false, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = domainEmailUserOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = domainEmailAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = domainEmailUserTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = domainEmailAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testDomainEmailUsersCount(t *testing.T) {
 	}
 }
 
-func domainEmailUserBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func domainEmailUserAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailUser) error {
-	*o = DomainEmailUser{}
+func domainEmailAliasAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *DomainEmailAlias) error {
+	*o = DomainEmailAlias{}
 	return nil
 }
 
-func testDomainEmailUsersHooks(t *testing.T) {
+func testDomainEmailAliasesHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &DomainEmailUser{}
-	o := &DomainEmailUser{}
+	empty := &DomainEmailAlias{}
+	o := &DomainEmailAlias{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser object: %s", err)
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias object: %s", err)
 	}
 
-	AddDomainEmailUserHook(boil.BeforeInsertHook, domainEmailUserBeforeInsertHook)
+	AddDomainEmailAliasHook(boil.BeforeInsertHook, domainEmailAliasBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserBeforeInsertHooks = []DomainEmailUserHook{}
+	domainEmailAliasBeforeInsertHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.AfterInsertHook, domainEmailUserAfterInsertHook)
+	AddDomainEmailAliasHook(boil.AfterInsertHook, domainEmailAliasAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserAfterInsertHooks = []DomainEmailUserHook{}
+	domainEmailAliasAfterInsertHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.AfterSelectHook, domainEmailUserAfterSelectHook)
+	AddDomainEmailAliasHook(boil.AfterSelectHook, domainEmailAliasAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserAfterSelectHooks = []DomainEmailUserHook{}
+	domainEmailAliasAfterSelectHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.BeforeUpdateHook, domainEmailUserBeforeUpdateHook)
+	AddDomainEmailAliasHook(boil.BeforeUpdateHook, domainEmailAliasBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserBeforeUpdateHooks = []DomainEmailUserHook{}
+	domainEmailAliasBeforeUpdateHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.AfterUpdateHook, domainEmailUserAfterUpdateHook)
+	AddDomainEmailAliasHook(boil.AfterUpdateHook, domainEmailAliasAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserAfterUpdateHooks = []DomainEmailUserHook{}
+	domainEmailAliasAfterUpdateHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.BeforeDeleteHook, domainEmailUserBeforeDeleteHook)
+	AddDomainEmailAliasHook(boil.BeforeDeleteHook, domainEmailAliasBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserBeforeDeleteHooks = []DomainEmailUserHook{}
+	domainEmailAliasBeforeDeleteHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.AfterDeleteHook, domainEmailUserAfterDeleteHook)
+	AddDomainEmailAliasHook(boil.AfterDeleteHook, domainEmailAliasAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserAfterDeleteHooks = []DomainEmailUserHook{}
+	domainEmailAliasAfterDeleteHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.BeforeUpsertHook, domainEmailUserBeforeUpsertHook)
+	AddDomainEmailAliasHook(boil.BeforeUpsertHook, domainEmailAliasBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserBeforeUpsertHooks = []DomainEmailUserHook{}
+	domainEmailAliasBeforeUpsertHooks = []DomainEmailAliasHook{}
 
-	AddDomainEmailUserHook(boil.AfterUpsertHook, domainEmailUserAfterUpsertHook)
+	AddDomainEmailAliasHook(boil.AfterUpsertHook, domainEmailAliasAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	domainEmailUserAfterUpsertHooks = []DomainEmailUserHook{}
+	domainEmailAliasAfterUpsertHooks = []DomainEmailAliasHook{}
 }
 
-func testDomainEmailUsersInsert(t *testing.T) {
+func testDomainEmailAliasesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testDomainEmailUsersInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testDomainEmailUsersInsert(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersInsertWhitelist(t *testing.T) {
+func testDomainEmailAliasesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(domainEmailUserColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(domainEmailAliasColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,17 +494,17 @@ func testDomainEmailUsersInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testDomainEmailUserToOneDomainUsingDomain(t *testing.T) {
+func testDomainEmailAliasToOneDomainUsingDomain(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local DomainEmailUser
+	var local DomainEmailAlias
 	var foreign Domain
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, domainEmailUserDBTypes, false, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err := randomize.Struct(seed, &local, domainEmailAliasDBTypes, false, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, domainDBTypes, false, domainColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize Domain struct: %s", err)
@@ -528,8 +528,8 @@ func testDomainEmailUserToOneDomainUsingDomain(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := DomainEmailUserSlice{&local}
-	if err = local.L.LoadDomain(ctx, tx, false, (*[]*DomainEmailUser)(&slice), nil); err != nil {
+	slice := DomainEmailAliasSlice{&local}
+	if err = local.L.LoadDomain(ctx, tx, false, (*[]*DomainEmailAlias)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.Domain == nil {
@@ -545,18 +545,18 @@ func testDomainEmailUserToOneDomainUsingDomain(t *testing.T) {
 	}
 }
 
-func testDomainEmailUserToOneSetOpDomainUsingDomain(t *testing.T) {
+func testDomainEmailAliasToOneSetOpDomainUsingDomain(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a DomainEmailUser
+	var a DomainEmailAlias
 	var b, c Domain
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, domainEmailUserDBTypes, false, strmangle.SetComplement(domainEmailUserPrimaryKeyColumns, domainEmailUserColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, domainEmailAliasDBTypes, false, strmangle.SetComplement(domainEmailAliasPrimaryKeyColumns, domainEmailAliasColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, domainDBTypes, false, strmangle.SetComplement(domainPrimaryKeyColumns, domainColumnsWithoutDefault)...); err != nil {
@@ -583,14 +583,14 @@ func testDomainEmailUserToOneSetOpDomainUsingDomain(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.DomainEmailUsers[0] != &a {
+		if x.R.DomainEmailAliases[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.DomainID != x.ID {
 			t.Error("foreign key was wrong value", a.DomainID)
 		}
 
-		if exists, err := DomainEmailUserExists(ctx, tx, a.DomainID, a.BaseAddress); err != nil {
+		if exists, err := DomainEmailAliasExists(ctx, tx, a.DomainID, a.Address); err != nil {
 			t.Fatal(err)
 		} else if !exists {
 			t.Error("want 'a' to exist")
@@ -599,14 +599,14 @@ func testDomainEmailUserToOneSetOpDomainUsingDomain(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersReload(t *testing.T) {
+func testDomainEmailAliasesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -621,14 +621,14 @@ func testDomainEmailUsersReload(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersReloadAll(t *testing.T) {
+func testDomainEmailAliasesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -638,21 +638,21 @@ func testDomainEmailUsersReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := DomainEmailUserSlice{o}
+	slice := DomainEmailAliasSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testDomainEmailUsersSelect(t *testing.T) {
+func testDomainEmailAliasesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -662,7 +662,7 @@ func testDomainEmailUsersSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := DomainEmailUsers().All(ctx, tx)
+	slice, err := DomainEmailAliases().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -673,25 +673,25 @@ func testDomainEmailUsersSelect(t *testing.T) {
 }
 
 var (
-	domainEmailUserDBTypes = map[string]string{`DomainID`: `uuid`, `BaseAddress`: `character varying`, `EncryptedPassword`: `bytea`, `Enabled`: `boolean`, `Quota`: `integer`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`}
-	_                      = bytes.MinRead
+	domainEmailAliasDBTypes = map[string]string{`DomainID`: `uuid`, `Address`: `character varying`, `Destinations`: `ARRAYtext`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`}
+	_                       = bytes.MinRead
 )
 
-func testDomainEmailUsersUpdate(t *testing.T) {
+func testDomainEmailAliasesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(domainEmailUserPrimaryKeyColumns) {
+	if 0 == len(domainEmailAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(domainEmailUserAllColumns) == len(domainEmailUserPrimaryKeyColumns) {
+	if len(domainEmailAliasAllColumns) == len(domainEmailAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -701,7 +701,7 @@ func testDomainEmailUsersUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -710,8 +710,8 @@ func testDomainEmailUsersUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -721,18 +721,18 @@ func testDomainEmailUsersUpdate(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersSliceUpdateAll(t *testing.T) {
+func testDomainEmailAliasesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(domainEmailUserAllColumns) == len(domainEmailUserPrimaryKeyColumns) {
+	if len(domainEmailAliasAllColumns) == len(domainEmailAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &DomainEmailUser{}
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := &DomainEmailAlias{}
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -742,7 +742,7 @@ func testDomainEmailUsersSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -751,18 +751,18 @@ func testDomainEmailUsersSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, domainEmailUserDBTypes, true, domainEmailUserPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err = randomize.Struct(seed, o, domainEmailAliasDBTypes, true, domainEmailAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(domainEmailUserAllColumns, domainEmailUserPrimaryKeyColumns) {
-		fields = domainEmailUserAllColumns
+	if strmangle.StringSliceMatch(domainEmailAliasAllColumns, domainEmailAliasPrimaryKeyColumns) {
+		fields = domainEmailAliasAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			domainEmailUserAllColumns,
-			domainEmailUserPrimaryKeyColumns,
+			domainEmailAliasAllColumns,
+			domainEmailAliasPrimaryKeyColumns,
 		)
 	}
 
@@ -780,7 +780,7 @@ func testDomainEmailUsersSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := DomainEmailUserSlice{o}
+	slice := DomainEmailAliasSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -788,29 +788,29 @@ func testDomainEmailUsersSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testDomainEmailUsersUpsert(t *testing.T) {
+func testDomainEmailAliasesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(domainEmailUserAllColumns) == len(domainEmailUserPrimaryKeyColumns) {
+	if len(domainEmailAliasAllColumns) == len(domainEmailAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := DomainEmailUser{}
-	if err = randomize.Struct(seed, &o, domainEmailUserDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	o := DomainEmailAlias{}
+	if err = randomize.Struct(seed, &o, domainEmailAliasDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert DomainEmailUser: %s", err)
+		t.Errorf("Unable to upsert DomainEmailAlias: %s", err)
 	}
 
-	count, err := DomainEmailUsers().Count(ctx, tx)
+	count, err := DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -819,15 +819,15 @@ func testDomainEmailUsersUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, domainEmailUserDBTypes, false, domainEmailUserPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize DomainEmailUser struct: %s", err)
+	if err = randomize.Struct(seed, &o, domainEmailAliasDBTypes, false, domainEmailAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize DomainEmailAlias struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert DomainEmailUser: %s", err)
+		t.Errorf("Unable to upsert DomainEmailAlias: %s", err)
 	}
 
-	count, err = DomainEmailUsers().Count(ctx, tx)
+	count, err = DomainEmailAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

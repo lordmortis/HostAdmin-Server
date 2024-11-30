@@ -3,36 +3,30 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/render"
 	"gopkg.in/errgo.v2/errors"
-	"net/http"
 
 	"github.com/lordmortis/HostAdmin-Server/datasource"
 )
 
-func DomainEmailUsers(router gin.IRoutes) {
-	router.GET("", listDomainEmailUsers)
-	router.POST("", createDomainEmailUser)
+func DomainEmailAliases(router gin.IRoutes) {
+	router.GET("", listDomainEmailAliases)
+	router.POST("", createDomainEmailAlias)
 }
 
-func DomainEmailUser(router gin.IRoutes) {
-	router.GET("", showDomainEmailUser)
-	router.PUT("", updateDomainEmailUser)
-	router.DELETE("", deleteDomainEmailUser)
+func DomainEmailAlias(router gin.IRoutes) {
+	router.GET("", showDomainEmailAlias)
+	router.PUT("", updateDomainEmailAlias)
+	router.DELETE("", deleteDomainEmailAlias)
 }
 
-func DomainEmailUserSelfAdmin(router gin.IRoutes) {
-	router.GET("/iosProfile", showIosProfile)
-}
-
-func listDomainEmailUsers(ctx *gin.Context) {
+func listDomainEmailAliases(ctx *gin.Context) {
 	//TODO: Validate user permissions
 	domain := fetchDomain(ctx)
 	if domain == nil {
 		return
 	}
 
-	models, count, err := domain.EmailUsers(ctx)
+	models, count, err := domain.EmailAliases(ctx)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return
@@ -41,14 +35,14 @@ func listDomainEmailUsers(ctx *gin.Context) {
 	JSONOkTable(ctx, models, count)
 }
 
-func createDomainEmailUser(ctx *gin.Context) {
+func createDomainEmailAlias(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
 	domain := fetchDomain(ctx)
 	if domain == nil {
 		return
 	}
 
-	model := datasource.DomainEmailUser{}
+	model := datasource.DomainEmailAlias{}
 
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		JSONBadRequest(ctx, gin.H{"general": [1]string{errors.Because(err, nil, "parse error").Error()}})
@@ -56,7 +50,7 @@ func createDomainEmailUser(ctx *gin.Context) {
 	}
 
 	domainID := domain.IDUuid
-	existing, err := datasource.DomainEmailUsers(ctx, domainID, model.BaseAddress, false)
+	existing, err := datasource.DomainEmailAliases(ctx, domainID, model.Address, false)
 	if err != nil {
 		fmt.Printf("Internal error: %s", err)
 		JSONInternalServerError(ctx, errors.New("Internal error"))
@@ -84,9 +78,9 @@ func createDomainEmailUser(ctx *gin.Context) {
 	JSONOk(ctx, model)
 }
 
-func showDomainEmailUser(ctx *gin.Context) {
+func showDomainEmailAlias(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
-	model := fetchDomainEmailUser(ctx)
+	model := fetchDomainEmailAlias(ctx)
 	if model == nil {
 		return
 	}
@@ -94,39 +88,9 @@ func showDomainEmailUser(ctx *gin.Context) {
 	JSONOk(ctx, model)
 }
 
-func showIosProfile(ctx *gin.Context) {
+func updateDomainEmailAlias(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
-	domain := fetchDomain(ctx)
-	user := fetchDomainEmailUser(ctx)
-	if user == nil || domain == nil {
-		return
-	}
-
-	password := ctx.Query("password")
-	if len(password) == 0 {
-		ctx.HTML(http.StatusOK,
-			"ios-email-profile-error.html",
-			gin.H{"errorText": "No password supplied"})
-		return
-	}
-
-	if !user.ValidatePassword(password) {
-		ctx.HTML(http.StatusOK,
-			"ios-email-profile-error.html",
-			gin.H{"errorText": "Invalid password or email"})
-		return
-	}
-
-	data := gin.H{"user": user, "domain": domain, "password": password}
-	ctx.Render(http.StatusOK, render.Data{
-		ContentType: "application/x-apple-aspen-config",
-	})
-	ctx.HTML(http.StatusOK, "ios-email-profile.xml", data)
-}
-
-func updateDomainEmailUser(ctx *gin.Context) {
-	//TODO: Validate user permissions - check that the user can administer domain.
-	model := fetchDomainEmailUser(ctx)
+	model := fetchDomainEmailAlias(ctx)
 	if model == nil {
 		return
 	}
@@ -156,9 +120,9 @@ func updateDomainEmailUser(ctx *gin.Context) {
 	}
 }
 
-func deleteDomainEmailUser(ctx *gin.Context) {
+func deleteDomainEmailAlias(ctx *gin.Context) {
 	//TODO: Validate user permissions - check that the user can administer domain.
-	model := fetchDomainEmailUser(ctx)
+	model := fetchDomainEmailAlias(ctx)
 	if model == nil {
 		return
 	}
@@ -172,17 +136,17 @@ func deleteDomainEmailUser(ctx *gin.Context) {
 	if updated {
 		JSONOkStatusResponse(ctx)
 	} else {
-		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to delete email user"}})
+		JSONBadRequest(ctx, gin.H{"general": [1]string{"unable to delete email alias"}})
 	}
 }
 
-func fetchDomainEmailUser(ctx *gin.Context) *datasource.DomainEmailUser {
+func fetchDomainEmailAlias(ctx *gin.Context) *datasource.DomainEmailAlias {
 	domain := fetchDomain(ctx)
 	if domain == nil {
 		return nil
 	}
 
-	model, err := datasource.DomainEmailUsers(ctx, domain.IDUuid, ctx.Param("base_address"), false)
+	model, err := datasource.DomainEmailAliases(ctx, domain.IDUuid, ctx.Param("address"), false)
 	if err != nil {
 		JSONInternalServerError(ctx, err)
 		return nil

@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/volatiletech/null/v8"
 	"time"
 
@@ -224,6 +225,14 @@ func (model *DomainEmailUser) ValidateUpdate() map[string]interface{} {
 	}
 
 	return errorMap
+}
+
+func (model *DomainEmailUser) ValidatePassword(password string) bool {
+	if err := argonValidate(model.dbModel.EncryptedPassword.Bytes, password); err != nil {
+		fmt.Printf("Password validation error: %s\n", err.Error())
+		return false
+	}
+	return true
 }
 
 func (model *DomainEmailUser) fromDB(ctx *gin.Context, dbCon *sql.DB, dbModel *datamodels_raw.DomainEmailUser, populateDomain bool) {

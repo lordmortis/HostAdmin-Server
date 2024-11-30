@@ -8,6 +8,8 @@
 // ../datasource/migrations/1585465452_create_domain_users.up.sql (323B)
 // ../datasource/migrations/1643446918_add_email_users.down.sql (31B)
 // ../datasource/migrations/1643446918_add_email_users.up.sql (340B)
+// ../datasource/migrations/1732505546_add_email_aliases.down.sql (32B)
+// ../datasource/migrations/1732505546_add_email_aliases.up.sql (260B)
 
 package migrationData
 
@@ -236,6 +238,46 @@ func _1643446918_add_email_usersUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __1732505546_add_email_aliasesDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\x09\xf2\x0f\x50\x08\x71\x74\xf2\x71\x55\x50\x4a\xc9\xcf\x4d\xcc\xcc\x8b\x4f\xcd\x4d\xcc\xcc\x89\x4f\xcc\xc9\x4c\x2c\x56\xb2\x06\x04\x00\x00\xff\xff\xf1\xc2\x0c\x66\x20\x00\x00\x00")
+
+func _1732505546_add_email_aliasesDownSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__1732505546_add_email_aliasesDownSql,
+		"1732505546_add_email_aliases.down.sql",
+	)
+}
+
+func _1732505546_add_email_aliasesDownSql() (*asset, error) {
+	bytes, err := _1732505546_add_email_aliasesDownSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "1732505546_add_email_aliases.down.sql", size: 32, mode: os.FileMode(0644), modTime: time.Unix(1732505679, 0)}
+	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x29, 0x81, 0xf4, 0x12, 0x62, 0x38, 0x5f, 0xe8, 0xda, 0x77, 0xf9, 0xed, 0x2a, 0x79, 0xe1, 0x84, 0xcd, 0x1b, 0x38, 0xe, 0xf7, 0x2b, 0x61, 0x22, 0x2d, 0xfe, 0x20, 0x73, 0x6, 0x2c, 0x5d, 0x1}}
+	return a, nil
+}
+
+var __1732505546_add_email_aliasesUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8c\xcd\x6a\x83\x40\x10\x80\xef\x3e\xc5\xe0\x49\xc1\x37\xe8\xc9\xb6\x7b\x90\x5a\x5b\x44\x0f\x52\x8a\x0c\xce\x94\x0e\xb8\xab\xec\x4c\x42\x1e\x3f\x90\x18\x0f\x42\xce\xdf\xcf\x5b\xeb\xca\xce\x41\x57\xbe\xd6\x0e\x52\x5a\x3c\x4a\x18\xd9\xa3\xcc\x23\xce\x82\x9a\x42\x96\x00\x00\x6c\x44\x08\xfa\xbe\x7a\x87\xe6\xab\x83\xa6\xaf\x6b\x88\xfc\xc7\x91\xc3\xc4\xba\x29\x9a\x09\xe5\xc5\xad\x41\xa2\xc8\xaa\x70\xc6\x38\xfd\x63\xdc\xa3\x3b\xfd\x6e\xab\xcf\xb2\x1d\xe0\xc3\x0d\xd9\x7e\x2f\x1e\xd1\xb6\x20\x56\x93\x80\x26\x4b\x50\x30\xbe\xd8\xcf\xef\x61\x33\x45\x46\x63\x1a\xd1\xc0\xc4\xb3\x1a\xfa\xf5\xa0\x9c\x56\x7a\xae\x24\xf9\xcb\x35\x00\x00\xff\xff\xb1\xa9\x94\x7b\x04\x01\x00\x00")
+
+func _1732505546_add_email_aliasesUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__1732505546_add_email_aliasesUpSql,
+		"1732505546_add_email_aliases.up.sql",
+	)
+}
+
+func _1732505546_add_email_aliasesUpSql() (*asset, error) {
+	bytes, err := _1732505546_add_email_aliasesUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "1732505546_add_email_aliases.up.sql", size: 260, mode: os.FileMode(0644), modTime: time.Unix(1732506719, 0)}
+	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x3d, 0xdc, 0xa7, 0x3a, 0xb8, 0x8c, 0xdd, 0xda, 0x34, 0xa2, 0x34, 0x24, 0xc8, 0x29, 0xe9, 0xb1, 0xad, 0xf1, 0x89, 0xe3, 0xf2, 0x9e, 0x19, 0x6, 0xbe, 0xc9, 0xe8, 0xd1, 0xd5, 0x5a, 0xcb, 0x57}}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -335,6 +377,8 @@ var _bindata = map[string]func() (*asset, error){
 	"1585465452_create_domain_users.up.sql":   _1585465452_create_domain_usersUpSql,
 	"1643446918_add_email_users.down.sql":     _1643446918_add_email_usersDownSql,
 	"1643446918_add_email_users.up.sql":       _1643446918_add_email_usersUpSql,
+	"1732505546_add_email_aliases.down.sql":   _1732505546_add_email_aliasesDownSql,
+	"1732505546_add_email_aliases.up.sql":     _1732505546_add_email_aliasesUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -386,6 +430,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"1585465452_create_domain_users.up.sql":   &bintree{_1585465452_create_domain_usersUpSql, map[string]*bintree{}},
 	"1643446918_add_email_users.down.sql":     &bintree{_1643446918_add_email_usersDownSql, map[string]*bintree{}},
 	"1643446918_add_email_users.up.sql":       &bintree{_1643446918_add_email_usersUpSql, map[string]*bintree{}},
+	"1732505546_add_email_aliases.down.sql":   &bintree{_1732505546_add_email_aliasesDownSql, map[string]*bintree{}},
+	"1732505546_add_email_aliases.up.sql":     &bintree{_1732505546_add_email_aliasesUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory.
