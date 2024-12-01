@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kevinburke/go-bindata"
+	"github.com/kevinburke/go-bindata/v4"
 	"gopkg.in/errgo.v2/errors"
 )
 
@@ -76,7 +76,7 @@ func (x *UpdateBindata) Execute(args []string) error {
 
 	config := bindata.Config{
 		Package: "templateData",
-		Input:   []bindata.InputConfig{bindata.InputConfig{Path: templatesDirectory, Recursive: true}},
+		Input:   []bindata.InputConfig{{Path: templatesDirectory, Recursive: true}},
 		Output:  filepath.Join(templatesBinDirectory, "main.go"),
 		Prefix:  templatesDirectory,
 	}
@@ -88,7 +88,7 @@ func (x *UpdateBindata) Execute(args []string) error {
 
 	config = bindata.Config{
 		Package: "migrationData",
-		Input:   []bindata.InputConfig{bindata.InputConfig{Path: migrationDirectory, Recursive: false}},
+		Input:   []bindata.InputConfig{{Path: migrationDirectory, Recursive: false}},
 		Output:  filepath.Join(binDataDirectory, "main.go"),
 		Prefix:  migrationDirectory,
 	}

@@ -1,6 +1,7 @@
 package datasource
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -32,14 +33,19 @@ func PerformMigrations(config config.DatabaseConfig, development bool) error {
 			return err
 		}
 		m, err = migrate.NewWithSourceInstance("go-bindata", d, connString)
+
 	}
 
 	if err != nil {
 		return err
 	}
-	
+
+	if m == nil {
+		return errors.New("Could not open database connection.")
+	}
+
 	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange{
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return err
 	}
 
